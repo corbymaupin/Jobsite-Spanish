@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jobsite Spanish</title>
+<style>
+  :root {
+    --concrete:   #E8E6E1;
+    --card:       #FFFFFF;
+    --ink:        #16181D;
+    --muted:      #6B6F76;
+    --hairline:   #CFCCC5;
+    --vial:       #FFC400;
+    --got-it:     #1F7A4D;
+    --missed:     #B3261E;
+
+    --step-0: 0.8125rem;
+    --step-1: 1rem;
+    --step-2: 1.375rem;
+    --step-3: 2.5rem;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--concrete);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: var(--step-1);
+    line-height: 1.45;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .wrap { max-width: 34rem; margin: 0 auto; padding: 1.25rem 1.125rem 3rem; }
+
+  .masthead {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--ink);
+  }
+  .masthead h1 { margin: 0; font-size: var(--step-2); font-weight: 800; letter-spacing: -0.02em; }
+  .masthead .count { font-size: var(--step-0); color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  /* Five bars, one per Leitner box. Left is what you keep missing,
+     right is what you know cold. Weight shifting right over weeks
+     is the only progress signal that matters here. */
+  .gauge {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.375rem;
+    margin: 1.25rem 0 1.5rem; align-items: end; height: 4.5rem;
+  }
+  .gauge-col { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; text-align: center; }
+  .gauge-bar { background: var(--ink); border-radius: 2px 2px 0 0; min-height: 3px; transition: height 200ms ease; }
+  .gauge-col:nth-child(5) .gauge-bar { background: var(--got-it); }
+  .gauge-n { font-size: 0.6875rem; color: var(--muted); padding-top: 0.3125rem; font-variant-numeric: tabular-nums; }
+
+  /* Trade filter. With 240 terms you rarely want the whole deck at
+     once, and drilling one trade before a specific day's work is
+     more useful than a random shuffle across everything. */
+  .filter { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-bottom: 1.25rem; }
+  .chip {
+    width: auto; padding: 0.4375rem 0.75rem; font-size: 0.8125rem; font-weight: 600;
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--hairline); border-radius: 999px;
+  }
+  .chip.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .chip .n { opacity: 0.6; font-variant-numeric: tabular-nums; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--hairline);
+    border-top: 4px solid var(--ink); padding: 2rem 1.375rem; text-align: center;
+  }
+  .card.is-phrase { border-top-color: var(--vial); }
+
+  .term { font-size: var(--step-3); font-weight: 800; letter-spacing: -0.03em; line-height: 1.12; margin: 0; word-wrap: break-word; }
+  .term.long { font-size: 1.625rem; letter-spacing: -0.02em; }
+  .side-note { font-size: var(--step-0); color: var(--muted); margin: 0.625rem 0 0; }
+
+  .answer { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed var(--hairline); }
+  .regional { font-size: var(--step-0); color: var(--muted); margin: 0.75rem 0 0; font-style: italic; }
+
+  button { font: inherit; font-weight: 700; border: none; border-radius: 4px; padding: 1.0625rem 1.25rem; width: 100%; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  button:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+  .btn-primary { background: var(--vial); color: var(--ink); }
+  .btn-flip    { background: var(--ink); color: #fff; margin-top: 1.75rem; }
+  .btn-quiet   { background: transparent; color: var(--muted); font-weight: 600; border: 1px solid var(--hairline); padding: 0.75rem; }
+
+  .verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem; margin-top: 1.75rem; }
+  .btn-missed { background: var(--missed); color: #fff; }
+  .btn-got-it { background: var(--got-it); color: #fff; }
+
+  .speak-btn {
+    display: inline-flex; align-items: center; gap: 0.4375rem; width: auto;
+    margin: 0.875rem auto 0; padding: 0.5rem 0.9375rem;
+    background: transparent; color: var(--ink);
+    border: 1px solid var(--hairline); border-radius: 999px;
+    font-size: 0.8125rem; font-weight: 600;
+  }
+  .speak-btn:active { background: var(--concrete); }
+  .speak-btn.speaking { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .speak-btn svg { flex-shrink: 0; }
+
+  .voice-note { font-size: 0.75rem; color: var(--muted); text-align: center; margin: 0.875rem 0 0; line-height: 1.4; }
+
+  .new-flag {
+    display: inline-block; font-size: 0.6875rem; font-weight: 700;
+    background: var(--vial); color: var(--ink);
+    padding: 0.1875rem 0.5rem; border-radius: 3px; margin-bottom: 0.875rem;
+  }
+
+  .stack > * + * { margin-top: 0.75rem; }
+  .spacer { height: 1.75rem; }
+
+  .progress { font-size: var(--step-0); color: var(--muted); text-align: center; margin-bottom: 0.875rem; font-variant-numeric: tabular-nums; }
+  .empty { text-align: center; padding: 2rem 1rem; }
+  .empty p { color: var(--muted); margin: 0.5rem 0 0; }
+  .hidden { display: none; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <h1>Jobsite Spanish</h1>
+    <span class="count" id="totalCount"></span>
+  </div>
+
+  <div class="gauge" id="gauge"></div>
+
+  <section id="homeScreen">
+    <div class="filter" id="filter"></div>
+    <div id="homeBody"></div>
+  </section>
+
+  <section id="studyScreen" class="hidden">
+    <p class="progress" id="progress"></p>
+    <div class="card" id="studyCard">
+      <span class="new-flag hidden" id="newFlag">New</span>
+      <p class="term" id="prompt"></p>
+
+      <button class="speak-btn hidden" id="promptSpeak" type="button">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/>
+        </svg>
+        Hear it
+      </button>
+
+      <p class="side-note" id="promptNote"></p>
+
+      <div class="answer hidden" id="answerBlock">
+        <p class="term" id="answer"></p>
+        <button class="speak-btn hidden" id="answerSpeak" type="button">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/>
+          </svg>
+          Hear it
+        </button>
+        <p class="regional hidden" id="regional"></p>
+      </div>
+    </div>
+
+    <p class="voice-note hidden" id="voiceNote"></p>
+
+    <button class="btn-flip" id="flipBtn">Show answer</button>
+
+    <div class="verdict hidden" id="verdict">
+      <button class="btn-missed" id="missedBtn">Missed it</button>
+      <button class="btn-got-it" id="gotItBtn">Got it</button>
+    </div>
+
+    <div class="spacer"></div>
+    <button class="btn-quiet" id="endBtn">End session</button>
+  </section>
+
+  <section id="doneScreen" class="hidden">
+    <div class="card">
+      <p class="term">Deck clear</p>
+      <p class="side-note" id="doneSummary"></p>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn-primary" id="backBtn">Back to start</button>
+  </section>
+
+</div>
+
+<script>
+/* =================================================================
+   1. THE VOCABULARY
+
+   Written for an English-speaking super or assistant super running
+   Texas crews, so the Spanish leans Mexican throughout.
+
+   Two conventions worth knowing before you read the list:
+
+   - Commands use the USTED form (venga, apague, mida), not the tu
+     form. Usted is the respectful register, and it's what you want
+     coming from a supervisor to a crew. Using tu forms to grown men
+     you've just met reads as talking down to them.
+
+   - Where Mexican usage differs from textbook Spanish, the textbook
+     word is the main answer and the Mexican one is in `region`.
+     Both are worth knowing: you'll SAY the local word and READ the
+     textbook one on submittals.
+   ================================================================= */
+
+const SEED_TERMS = [
+
+  /* ---- CONCRETE ---- */
+  { en: "concrete",           es: "el concreto",              region: "Spain: el hormigón",        trade: "Concrete" },
+  { en: "cement",             es: "el cemento",               region: "",                          trade: "Concrete" },
+  { en: "rebar",              es: "la varilla",               region: "Formal: varilla corrugada", trade: "Concrete" },
+  { en: "formwork",           es: "la cimbra",                region: "S. America: el encofrado",  trade: "Concrete" },
+  { en: "concrete slab",      es: "la losa",                  region: "",                          trade: "Concrete" },
+  { en: "the pour",           es: "el colado",                region: "Also: el vaciado",          trade: "Concrete" },
+  { en: "curing",             es: "el curado",                region: "",                          trade: "Concrete" },
+  { en: "slump",              es: "el revenimiento",          region: "",                          trade: "Concrete" },
+  { en: "footing",            es: "la zapata",                region: "",                          trade: "Concrete" },
+  { en: "gravel",             es: "la grava",                 region: "",                          trade: "Concrete" },
+  { en: "sand",               es: "la arena",                 region: "",                          trade: "Concrete" },
+  { en: "aggregate",          es: "el agregado",              region: "",                          trade: "Concrete" },
+  { en: "concrete mixer",     es: "la revolvedora",           region: "Also: la mezcladora",       trade: "Concrete" },
+  { en: "mixer truck",        es: "el camión revolvedor",     region: "Mexico, slang: la olla",    trade: "Concrete" },
+  { en: "concrete vibrator",  es: "el vibrador",              region: "",                          trade: "Concrete" },
+  { en: "screed",             es: "la regla",                 region: "",                          trade: "Concrete" },
+  { en: "trowel",             es: "la llana",                 region: "Also: la cuchara",          trade: "Concrete" },
+  { en: "broom finish",       es: "el acabado escobillado",   region: "",                          trade: "Concrete" },
+  { en: "control joint",      es: "la junta de control",      region: "",                          trade: "Concrete" },
+  { en: "anchor bolt",        es: "el perno de anclaje",      region: "Also: el ancla",            trade: "Concrete" },
+  { en: "wire mesh",          es: "la malla electrosoldada",  region: "",                          trade: "Concrete" },
+  { en: "tie wire",           es: "el alambre recocido",      region: "",                          trade: "Concrete" },
+  { en: "column",             es: "la columna",               region: "",                          trade: "Concrete" },
+  { en: "beam",               es: "la viga",                  region: "Mexico: la trabe",          trade: "Concrete" },
+  { en: "mortar",             es: "la mezcla",                region: "Formal: el mortero",        trade: "Concrete" },
+  { en: "concrete block",     es: "el bloque",                region: "Mexico: el block",          trade: "Concrete" },
+
+  /* ---- FRAMING ---- */
+  { en: "stud",               es: "el poste",                 region: "Also: el montante",         trade: "Framing" },
+  { en: "joist",              es: "la vigueta",               region: "",                          trade: "Framing" },
+  { en: "rafter",             es: "el par",                   region: "Also: la viga de techo",    trade: "Framing" },
+  { en: "header",             es: "el cabezal",               region: "Also: el dintel",           trade: "Framing" },
+  { en: "sheathing",          es: "el forro",                 region: "Also: el entablado",        trade: "Framing" },
+  { en: "top plate",          es: "la solera superior",       region: "",                          trade: "Framing" },
+  { en: "bottom plate",       es: "la solera inferior",       region: "",                          trade: "Framing" },
+  { en: "blocking",           es: "el bloqueo",               region: "Also: los travesaños",      trade: "Framing" },
+  { en: "truss",              es: "la armadura",              region: "Also: la cercha",           trade: "Framing" },
+  { en: "lumber",             es: "la madera",                region: "",                          trade: "Framing" },
+  { en: "two-by-four",        es: "el dos por cuatro",        region: "",                          trade: "Framing" },
+  { en: "plywood",            es: "la madera contrachapada",  region: "Mexico: el triplay",        trade: "Framing" },
+  { en: "stud spacing",       es: "la separación de postes",  region: "",                          trade: "Framing" },
+  { en: "on center",          es: "a ejes",                   region: "Also: a centros",           trade: "Framing" },
+  { en: "plumb",              es: "a plomo",                  region: "",                          trade: "Framing" },
+  { en: "level (aligned)",    es: "a nivel",                  region: "",                          trade: "Framing" },
+  { en: "square (aligned)",   es: "a escuadra",               region: "",                          trade: "Framing" },
+  { en: "brace",              es: "el puntal",                region: "",                          trade: "Framing" },
+  { en: "shim",               es: "la cuña",                  region: "",                          trade: "Framing" },
+  { en: "nail",               es: "el clavo",                 region: "",                          trade: "Framing" },
+  { en: "screw",              es: "el tornillo",              region: "",                          trade: "Framing" },
+  { en: "the framing",        es: "la estructura",            region: "",                          trade: "Framing" },
+  { en: "wall",               es: "el muro",                  region: "Also: la pared",            trade: "Framing" },
+  { en: "ceiling",            es: "el techo",                 region: "Suspended: el plafón",      trade: "Framing" },
+  { en: "floor",              es: "el piso",                  region: "",                          trade: "Framing" },
+  { en: "stairs",             es: "la escalera",              region: "",                          trade: "Framing" },
+
+  /* ---- MEP ---- */
+  { en: "conduit",            es: "el conducto",              region: "Also: la tubería eléctrica", trade: "MEP" },
+  { en: "breaker panel",      es: "el tablero eléctrico",     region: "",                          trade: "MEP" },
+  { en: "ductwork",           es: "los ductos",               region: "",                          trade: "MEP" },
+  { en: "water heater",       es: "el calentador de agua",    region: "Mexico: el bóiler",         trade: "MEP" },
+  { en: "drain pipe",         es: "el tubo de desagüe",       region: "",                          trade: "MEP" },
+  { en: "wiring",             es: "el cableado",              region: "",                          trade: "MEP" },
+  { en: "valve",              es: "la válvula",               region: "",                          trade: "MEP" },
+  { en: "circuit breaker",    es: "el interruptor",           region: "Mexico: el breaker",        trade: "MEP" },
+  { en: "electrical outlet",  es: "el contacto",              region: "Also: el enchufe",          trade: "MEP" },
+  { en: "light switch",       es: "el apagador",              region: "Also: el interruptor",      trade: "MEP" },
+  { en: "light fixture",      es: "la luminaria",             region: "",                          trade: "MEP" },
+  { en: "junction box",       es: "la caja de conexiones",    region: "",                          trade: "MEP" },
+  { en: "ground (electrical)",es: "la tierra",                region: "",                          trade: "MEP" },
+  { en: "voltage",            es: "el voltaje",               region: "",                          trade: "MEP" },
+  { en: "extension cord",     es: "la extensión",             region: "",                          trade: "MEP" },
+  { en: "pipe",               es: "el tubo",                  region: "Also: la tubería",          trade: "MEP" },
+  { en: "fitting",            es: "la conexión",              region: "",                          trade: "MEP" },
+  { en: "elbow",              es: "el codo",                  region: "",                          trade: "MEP" },
+  { en: "coupling",           es: "el cople",                 region: "",                          trade: "MEP" },
+  { en: "copper pipe",        es: "el tubo de cobre",         region: "",                          trade: "MEP" },
+  { en: "weld / solder",      es: "la soldadura",             region: "",                          trade: "MEP" },
+  { en: "leak",               es: "la fuga",                  region: "",                          trade: "MEP" },
+  { en: "water supply",       es: "la toma de agua",          region: "",                          trade: "MEP" },
+  { en: "sewer",              es: "el drenaje",               region: "",                          trade: "MEP" },
+  { en: "air conditioning",   es: "el aire acondicionado",    region: "",                          trade: "MEP" },
+  { en: "thermostat",         es: "el termostato",            region: "",                          trade: "MEP" },
+  { en: "vent",               es: "la ventila",               region: "Also: el respiradero",      trade: "MEP" },
+  { en: "insulated wire",     es: "el cable forrado",         region: "",                          trade: "MEP" },
+
+  /* ---- SITE WORK ---- */
+  { en: "excavation",         es: "la excavación",            region: "",                          trade: "Site work" },
+  { en: "backfill",           es: "el relleno",               region: "",                          trade: "Site work" },
+  { en: "compaction",         es: "la compactación",          region: "",                          trade: "Site work" },
+  { en: "grading",            es: "la nivelación",            region: "",                          trade: "Site work" },
+  { en: "trench",             es: "la zanja",                 region: "",                          trade: "Site work" },
+  { en: "shoring",            es: "el apuntalamiento",        region: "Also: la entibación",       trade: "Site work" },
+  { en: "survey stake",       es: "la estaca",                region: "",                          trade: "Site work" },
+  { en: "dirt / soil",        es: "la tierra",                region: "",                          trade: "Site work" },
+  { en: "mud",                es: "el lodo",                  region: "",                          trade: "Site work" },
+  { en: "dust",               es: "el polvo",                 region: "",                          trade: "Site work" },
+  { en: "excavator",          es: "la excavadora",            region: "",                          trade: "Site work" },
+  { en: "backhoe",            es: "la retroexcavadora",       region: "",                          trade: "Site work" },
+  { en: "skid steer",         es: "el minicargador",          region: "Mexico: el bobcat",         trade: "Site work" },
+  { en: "dump truck",         es: "el camión de volteo",      region: "",                          trade: "Site work" },
+  { en: "plate compactor",    es: "la compactadora",          region: "Jumping jack: el bailarín", trade: "Site work" },
+  { en: "silt fence",         es: "la barrera de sedimento",  region: "",                          trade: "Site work" },
+  { en: "topsoil",            es: "la capa vegetal",          region: "",                          trade: "Site work" },
+  { en: "slope",              es: "el talud",                 region: "",                          trade: "Site work" },
+  { en: "layout",             es: "el trazo",                 region: "",                          trade: "Site work" },
+  { en: "string line",        es: "el hilo",                  region: "",                          trade: "Site work" },
+  { en: "elevation",          es: "el nivel",                 region: "",                          trade: "Site work" },
+  { en: "fill dirt",          es: "el material de relleno",   region: "",                          trade: "Site work" },
+
+  /* ---- TOOLS ---- */
+  { en: "tape measure",       es: "la cinta métrica",         region: "Mexico: el flexómetro",     trade: "Tools" },
+  { en: "level (tool)",       es: "el nivel",                 region: "",                          trade: "Tools" },
+  { en: "hammer",             es: "el martillo",              region: "",                          trade: "Tools" },
+  { en: "drill",              es: "el taladro",               region: "",                          trade: "Tools" },
+  { en: "saw",                es: "la sierra",                region: "",                          trade: "Tools" },
+  { en: "circular saw",       es: "la sierra circular",       region: "",                          trade: "Tools" },
+  { en: "reciprocating saw",  es: "el sable",                 region: "",                          trade: "Tools" },
+  { en: "grinder",            es: "la pulidora",              region: "Also: el esmeril",          trade: "Tools" },
+  { en: "wheelbarrow",        es: "la carretilla",            region: "",                          trade: "Tools" },
+  { en: "shovel",             es: "la pala",                  region: "",                          trade: "Tools" },
+  { en: "pick",               es: "el pico",                  region: "",                          trade: "Tools" },
+  { en: "rake",               es: "el rastrillo",             region: "",                          trade: "Tools" },
+  { en: "broom",              es: "la escoba",                region: "",                          trade: "Tools" },
+  { en: "bucket",             es: "la cubeta",                region: "",                          trade: "Tools" },
+  { en: "ladder",             es: "la escalera",              region: "",                          trade: "Tools" },
+  { en: "scaffold",           es: "el andamio",               region: "",                          trade: "Tools" },
+  { en: "screwdriver",        es: "el desarmador",            region: "Also: el destornillador",   trade: "Tools" },
+  { en: "pliers",             es: "las pinzas",               region: "",                          trade: "Tools" },
+  { en: "wrench",             es: "la llave",                 region: "",                          trade: "Tools" },
+  { en: "chalk line",         es: "el hilo de gis",           region: "",                          trade: "Tools" },
+  { en: "utility knife",      es: "la navaja",                region: "",                          trade: "Tools" },
+  { en: "nail gun",           es: "la clavadora",             region: "",                          trade: "Tools" },
+  { en: "impact driver",      es: "el impacto",               region: "",                          trade: "Tools" },
+  { en: "generator",          es: "la planta de luz",         region: "Also: el generador",        trade: "Tools" },
+  { en: "chainsaw",           es: "la motosierra",            region: "",                          trade: "Tools" },
+  { en: "sledgehammer",       es: "el marro",                 region: "",                          trade: "Tools" },
+
+  /* ---- MATERIALS & FINISHES ---- */
+  { en: "drywall",            es: "el panel de yeso",         region: "Mexico: el tablaroca",      trade: "Finishes" },
+  { en: "insulation",         es: "el aislamiento",           region: "",                          trade: "Finishes" },
+  { en: "joint compound",     es: "la pasta",                 region: "",                          trade: "Finishes" },
+  { en: "drywall tape",       es: "la cinta",                 region: "",                          trade: "Finishes" },
+  { en: "paint",              es: "la pintura",               region: "",                          trade: "Finishes" },
+  { en: "primer",             es: "el primario",              region: "Also: la primera mano",     trade: "Finishes" },
+  { en: "caulk",              es: "el silicón",               region: "",                          trade: "Finishes" },
+  { en: "wall tile",          es: "el azulejo",               region: "",                          trade: "Finishes" },
+  { en: "floor tile",         es: "la loseta",                region: "",                          trade: "Finishes" },
+  { en: "grout",              es: "la lechada",               region: "Mexico: la boquilla",       trade: "Finishes" },
+  { en: "brick",              es: "el ladrillo",              region: "",                          trade: "Finishes" },
+  { en: "stucco",             es: "el aplanado",              region: "Also: el estuco",           trade: "Finishes" },
+  { en: "roofing",            es: "el techado",               region: "",                          trade: "Finishes" },
+  { en: "shingle",            es: "la teja",                  region: "",                          trade: "Finishes" },
+  { en: "flashing",           es: "el tapajuntas",            region: "",                          trade: "Finishes" },
+  { en: "gutter",             es: "la canaleta",              region: "",                          trade: "Finishes" },
+  { en: "window",             es: "la ventana",               region: "",                          trade: "Finishes" },
+  { en: "door",               es: "la puerta",                region: "",                          trade: "Finishes" },
+  { en: "door frame",         es: "el marco",                 region: "",                          trade: "Finishes" },
+  { en: "baseboard",          es: "el rodapié",               region: "Mexico: el zoclo",          trade: "Finishes" },
+  { en: "adhesive",           es: "el pegamento",             region: "",                          trade: "Finishes" },
+  { en: "sealant",            es: "el sellador",              region: "",                          trade: "Finishes" },
+  { en: "plastic sheeting",   es: "el plástico",              region: "",                          trade: "Finishes" },
+  { en: "insulation batt",    es: "el rollo de aislante",     region: "",                          trade: "Finishes" },
+
+  /* ---- SAFETY ---- */
+  { en: "safety",             es: "la seguridad",             region: "",                          trade: "Safety" },
+  { en: "hard hat",           es: "el casco",                 region: "",                          trade: "Safety" },
+  { en: "safety glasses",     es: "los lentes de seguridad",  region: "Also: las gafas",           trade: "Safety" },
+  { en: "gloves",             es: "los guantes",              region: "",                          trade: "Safety" },
+  { en: "safety harness",     es: "el arnés de seguridad",    region: "",                          trade: "Safety" },
+  { en: "safety vest",        es: "el chaleco",               region: "",                          trade: "Safety" },
+  { en: "steel-toe boots",    es: "las botas con casquillo",  region: "",                          trade: "Safety" },
+  { en: "ear plugs",          es: "los tapones",              region: "",                          trade: "Safety" },
+  { en: "dust mask",          es: "el cubrebocas",            region: "Also: la mascarilla",       trade: "Safety" },
+  { en: "fall protection",    es: "la protección contra caídas", region: "",                       trade: "Safety" },
+  { en: "lanyard",            es: "la línea de vida",         region: "",                          trade: "Safety" },
+  { en: "guardrail",          es: "el barandal",              region: "",                          trade: "Safety" },
+  { en: "first aid",          es: "los primeros auxilios",    region: "",                          trade: "Safety" },
+  { en: "accident",           es: "el accidente",             region: "",                          trade: "Safety" },
+  { en: "injury",             es: "la lesión",                region: "",                          trade: "Safety" },
+  { en: "emergency",          es: "la emergencia",            region: "",                          trade: "Safety" },
+  { en: "fire extinguisher",  es: "el extintor",              region: "",                          trade: "Safety" },
+  { en: "danger",             es: "el peligro",               region: "",                          trade: "Safety" },
+  { en: "caution tape",       es: "la cinta de precaución",   region: "",                          trade: "Safety" },
+  { en: "confined space",     es: "el espacio confinado",     region: "",                          trade: "Safety" },
+  { en: "lockout tagout",     es: "el bloqueo y etiquetado",  region: "",                          trade: "Safety" },
+  { en: "toolbox talk",       es: "la charla de seguridad",   region: "",                          trade: "Safety" },
+
+  /* ---- PEOPLE & PAPERWORK ---- */
+  { en: "drawings",           es: "los planos",               region: "",                          trade: "Office" },
+  { en: "crew",               es: "la cuadrilla",             region: "",                          trade: "Office" },
+  { en: "foreman",            es: "el capataz",               region: "Mexico: el mayordomo",      trade: "Office" },
+  { en: "superintendent",     es: "el superintendente",       region: "",                          trade: "Office" },
+  { en: "subcontractor",      es: "el subcontratista",        region: "",                          trade: "Office" },
+  { en: "general contractor", es: "el contratista general",   region: "",                          trade: "Office" },
+  { en: "owner",              es: "el dueño",                 region: "Formal: el propietario",    trade: "Office" },
+  { en: "architect",          es: "el arquitecto",            region: "",                          trade: "Office" },
+  { en: "engineer",           es: "el ingeniero",             region: "",                          trade: "Office" },
+  { en: "inspector",          es: "el inspector",             region: "",                          trade: "Office" },
+  { en: "laborer",            es: "el peón",                  region: "Also: el ayudante",         trade: "Office" },
+  { en: "equipment operator", es: "el operador",              region: "",                          trade: "Office" },
+  { en: "punch list",         es: "la lista de pendientes",   region: "",                          trade: "Office" },
+  { en: "schedule",           es: "el cronograma",            region: "Also: el programa de obra", trade: "Office" },
+  { en: "deadline",           es: "la fecha límite",          region: "",                          trade: "Office" },
+  { en: "estimate",           es: "el presupuesto",           region: "Also: la cotización",       trade: "Office" },
+  { en: "change order",       es: "la orden de cambio",       region: "",                          trade: "Office" },
+  { en: "invoice",            es: "la factura",               region: "",                          trade: "Office" },
+  { en: "inspection",         es: "la inspección",            region: "",                          trade: "Office" },
+  { en: "permit",             es: "el permiso",               region: "",                          trade: "Office" },
+  { en: "measurement",        es: "la medida",                region: "",                          trade: "Office" },
+  { en: "the jobsite",        es: "la obra",                  region: "",                          trade: "Office" },
+  { en: "delivery",           es: "la entrega",               region: "",                          trade: "Office" },
+  { en: "shift",              es: "el turno",                 region: "",                          trade: "Office" },
+  { en: "break",              es: "el descanso",              region: "",                          trade: "Office" },
+  { en: "overtime",           es: "el tiempo extra",          region: "",                          trade: "Office" },
+  { en: "payday",             es: "el día de pago",           region: "",                          trade: "Office" },
+  { en: "material",           es: "el material",              region: "",                          trade: "Office" },
+
+  /* ---- PHRASES ----
+     Kept deliberately short. Every one of these is something you'd
+     say several times a day, and none of them require thinking about
+     grammar before they come out. All commands are usted form. */
+
+  { en: "Good morning.",              es: "Buenos días.",            region: "",                     trade: "Phrases" },
+  { en: "How's it going?",            es: "¿Cómo va?",               region: "",                     trade: "Phrases" },
+  { en: "How is the work going?",     es: "¿Cómo va el trabajo?",    region: "",                     trade: "Phrases" },
+  { en: "Everything good?",           es: "¿Todo bien?",             region: "",                     trade: "Phrases" },
+  { en: "Good work.",                 es: "Buen trabajo.",           region: "",                     trade: "Phrases" },
+  { en: "Thank you.",                 es: "Gracias.",                region: "",                     trade: "Phrases" },
+  { en: "Please.",                    es: "Por favor.",              region: "",                     trade: "Phrases" },
+  { en: "See you tomorrow.",          es: "Hasta mañana.",           region: "",                     trade: "Phrases" },
+  { en: "Come here, please.",         es: "Venga, por favor.",       region: "",                     trade: "Phrases" },
+  { en: "Wait a moment.",             es: "Espere un momento.",      region: "",                     trade: "Phrases" },
+  { en: "Stop.",                      es: "Pare.",                   region: "Urgent: ¡Alto!",       trade: "Phrases" },
+  { en: "Let's go.",                  es: "Vámonos.",                region: "",                     trade: "Phrases" },
+  { en: "Follow me.",                 es: "Sígame.",                 region: "",                     trade: "Phrases" },
+  { en: "Over here.",                 es: "Por acá.",                region: "",                     trade: "Phrases" },
+  { en: "Over there.",                es: "Por allá.",               region: "",                     trade: "Phrases" },
+  { en: "Not there.",                 es: "Ahí no.",                 region: "",                     trade: "Phrases" },
+  { en: "Like this.",                 es: "Así.",                    region: "",                     trade: "Phrases" },
+  { en: "Do it again.",               es: "Hágalo otra vez.",        region: "",                     trade: "Phrases" },
+  { en: "Turn it off.",               es: "Apáguelo.",               region: "",                     trade: "Phrases" },
+  { en: "Turn it on.",                es: "Préndalo.",               region: "",                     trade: "Phrases" },
+  { en: "Clean this up.",             es: "Limpie esto.",            region: "",                     trade: "Phrases" },
+  { en: "Move this.",                 es: "Mueva esto.",             region: "",                     trade: "Phrases" },
+  { en: "Careful!",                   es: "¡Cuidado!",               region: "",                     trade: "Phrases" },
+  { en: "Do you need anything?",      es: "¿Necesita algo?",         region: "",                     trade: "Phrases" },
+  { en: "What do you need?",          es: "¿Qué necesita?",          region: "",                     trade: "Phrases" },
+  { en: "Do you have material?",      es: "¿Tiene material?",        region: "",                     trade: "Phrases" },
+  { en: "How much longer?",           es: "¿Cuánto falta?",          region: "",                     trade: "Phrases" },
+  { en: "When will it be done?",      es: "¿Cuándo termina?",        region: "",                     trade: "Phrases" },
+  { en: "Is it done?",                es: "¿Ya está?",               region: "",                     trade: "Phrases" },
+  { en: "What happened?",             es: "¿Qué pasó?",              region: "",                     trade: "Phrases" },
+  { en: "Who is the foreman?",        es: "¿Quién es el mayordomo?", region: "",                     trade: "Phrases" },
+  { en: "Do you understand me?",      es: "¿Me entiende?",           region: "",                     trade: "Phrases" },
+  { en: "Can you repeat that?",       es: "¿Puede repetir?",         region: "",                     trade: "Phrases" },
+  { en: "Where is it?",               es: "¿Dónde está?",            region: "",                     trade: "Phrases" },
+  { en: "How many?",                  es: "¿Cuántos?",               region: "",                     trade: "Phrases" },
+  { en: "Put on your hard hat.",      es: "Póngase el casco.",       region: "",                     trade: "Phrases" },
+  { en: "Wear your safety glasses.",  es: "Use sus lentes.",         region: "",                     trade: "Phrases" },
+  { en: "Is anyone hurt?",            es: "¿Hay alguien herido?",    region: "",                     trade: "Phrases" },
+  { en: "Everybody out.",             es: "Salgan todos.",           region: "",                     trade: "Phrases" },
+  { en: "Don't do that.",             es: "No haga eso.",            region: "",                     trade: "Phrases" },
+  { en: "I don't speak much Spanish.",es: "No hablo mucho español.", region: "",                     trade: "Phrases" },
+  { en: "Speak slower, please.",      es: "Hable más despacio.",     region: "",                     trade: "Phrases" },
+  { en: "One moment.",                es: "Un momento.",             region: "",                     trade: "Phrases" },
+  { en: "Tomorrow at seven.",         es: "Mañana a las siete.",     region: "",                     trade: "Phrases" },
+  { en: "We need this today.",        es: "Necesitamos esto hoy.",   region: "",                     trade: "Phrases" },
+  { en: "It's not level.",            es: "No está a nivel.",        region: "",                     trade: "Phrases" },
+  { en: "It's not plumb.",            es: "No está a plomo.",        region: "",                     trade: "Phrases" },
+  { en: "Measure it again.",          es: "Mídalo otra vez.",        region: "",                     trade: "Phrases" },
+  { en: "Bring me the drawings.",     es: "Tráigame los planos.",    region: "",                     trade: "Phrases" },
+  { en: "That's all for today.",      es: "Eso es todo por hoy.",    region: "",                     trade: "Phrases" }
+];
+
+
+/* =================================================================
+   2. DATES
+
+   Everything uses a plain "YYYY-MM-DD" string instead of a Date
+   object. Two reasons, both learned the hard way:
+
+   - Date objects carry a time of day. A card reviewed at 11pm and
+     one reviewed at 6am compare differently even though both
+     happened "today". Dropping the time removes that whole class
+     of bug.
+   - "YYYY-MM-DD" strings compare correctly with plain < and >,
+     because the digits run largest-unit-first. "2026-03-09" is
+     less than "2026-03-10", and that's all this app ever needs.
+   ================================================================= */
+
+function todayKey() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");  // getMonth() is zero-based
+  const day = String(now.getDate()).padStart(2, "0");
+  return year + "-" + month + "-" + day;
+}
+
+function addDays(dateKey, days) {
+  // Split the string apart rather than letting Date parse it, which
+  // avoids the timezone trap where "2026-03-09" is read as UTC
+  // midnight and lands on the 8th in Texas.
+  const parts = dateKey.split("-");
+  const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  d.setDate(d.getDate() + days);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return year + "-" + month + "-" + day;
+}
+
+
+/* =================================================================
+   3. LEITNER BOXES AND PACING
+
+   Box 1 is the pile you keep missing; box 5 is the pile you know
+   cold. Right answer moves a card up one box and pushes the next
+   review further out. Wrong answer drops it straight back to box 1.
+   Intervals double because forgetting isn't linear: once a word has
+   survived a week, it usually survives two.
+
+   NEW_PER_DAY is the important number. There are 250 terms in here.
+   Dumping all of them into day one would give you a 250-card first
+   session and you'd never open the app again. Instead the deck
+   feeds you a handful of unseen cards a day on top of whatever is
+   due for review, so the workload stays roughly flat. Full deck
+   introduced in about three weeks.
+   ================================================================= */
+
+const BOX_INTERVALS = { 1: 1, 2: 2, 3: 4, 4: 8, 5: 16 };
+const MAX_BOX = 5;
+const NEW_PER_DAY = 12;
+
+function calculateNextReview(box) {
+  return addDays(todayKey(), BOX_INTERVALS[box]);
+}
+
+
+/* =================================================================
+   4. SAVING AND LOADING
+
+   localStorage is a small box of text the browser keeps for this
+   page. It only holds strings, so state goes in as JSON and gets
+   parsed back on the way out.
+   ================================================================= */
+
+const STORAGE_KEY = "jobsite-spanish-v2";
+
+let state = { terms: [], newTracker: { date: "", count: 0 } };
+
+function save() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (err) {
+    // Private browsing can refuse to save. Better to keep working
+    // in memory than to crash mid-session.
+    console.warn("Could not save progress:", err);
+  }
+}
+
+function buildFreshState() {
+  return {
+    terms: SEED_TERMS.map(function (term, index) {
+      // Object.assign copies the seed fields into a NEW object, so
+      // SEED_TERMS itself is never modified.
+      return Object.assign({}, term, {
+        id: index,
+        box: 1,
+        introduced: false,   // hasn't been shown yet
+        nextReview: null     // no schedule until it's introduced
+      });
+    }),
+    newTracker: { date: "", count: 0 }
+  };
+}
+
+function load() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+
+  if (saved) {
+    try {
+      state = JSON.parse(saved);
+      if (state.terms && state.terms.length) return;
+    } catch (err) {
+      console.warn("Saved data was unreadable. Starting fresh.");
+    }
+  }
+
+  state = buildFreshState();
+  save();
+}
+
+
+/* =================================================================
+   5. READING THE STATE
+   ================================================================= */
+
+function matchesFilter(term) {
+  return activeTrade === "All" || term.trade === activeTrade;
+}
+
+function getTermsDue() {
+  const today = todayKey();
+  return state.terms.filter(function (term) {
+    return term.introduced && term.nextReview <= today && matchesFilter(term);
+  });
+}
+
+function newCardsLeftToday() {
+  // Reset the counter when the date rolls over.
+  if (state.newTracker.date !== todayKey()) {
+    state.newTracker = { date: todayKey(), count: 0 };
+  }
+  return Math.max(0, NEW_PER_DAY - state.newTracker.count);
+}
+
+function getNewTerms() {
+  const room = newCardsLeftToday();
+  if (room === 0) return [];
+  return state.terms.filter(function (term) {
+    return !term.introduced && matchesFilter(term);
+  }).slice(0, room);
+}
+
+function getBoxCounts() {
+  const counts = [0, 0, 0, 0, 0];
+  state.terms.forEach(function (term) {
+    if (term.introduced) counts[term.box - 1]++;
+  });
+  return counts;
+}
+
+function getTrades() {
+  const seen = [];
+  SEED_TERMS.forEach(function (term) {
+    if (seen.indexOf(term.trade) === -1) seen.push(term.trade);
+  });
+  return seen;
+}
+
+
+/* =================================================================
+   6. PRONUNCIATION
+
+   Every modern browser ships a speech engine at window.speechSynthesis.
+   No library, no API key, no network call once the voice is on the
+   device.
+
+   The catch: which voices exist depends on the phone, not on this
+   code. So rather than demanding one voice, rank what we want and
+   take the best available.
+   ================================================================= */
+
+const TTS_SUPPORTED = "speechSynthesis" in window;
+
+// es-MX is Mexican Spanish. es-US is the US Latino voice, close
+// enough for jobsite purposes. es-419 is Latin American Spanish
+// generally. Peninsular (es-ES) is last: understandable everywhere,
+// but the c/z lisp isn't what a crew from Michoacán sounds like.
+const VOICE_PREFERENCE = ["es-MX", "es-US", "es-419", "es-CO", "es-AR", "es-ES"];
+
+let spanishVoice = null;
+
+function normalizeLang(lang) {
+  // Android reports "es_MX" with an underscore; everyone else uses
+  // "es-MX". Flatten both to the hyphen form.
+  return (lang || "").replace("_", "-");
+}
+
+function pickSpanishVoice() {
+  if (!TTS_SUPPORTED) return;
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length === 0) return;
+
+  for (let i = 0; i < VOICE_PREFERENCE.length; i++) {
+    const match = voices.filter(function (v) {
+      return normalizeLang(v.lang) === VOICE_PREFERENCE[i];
+    })[0];
+    if (match) { spanishVoice = match; return; }
+  }
+
+  spanishVoice = voices.filter(function (v) {
+    return normalizeLang(v.lang).indexOf("es") === 0;
+  })[0] || null;
+}
+
+function speakSpanish(text, button) {
+  if (!TTS_SUPPORTED) return;
+
+  // Stop anything mid-sentence. Without this, a second tap queues
+  // the word up behind the first rather than replaying it.
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  if (spanishVoice) {
+    utterance.voice = spanishVoice;
+    utterance.lang = spanishVoice.lang;
+  } else {
+    utterance.lang = "es-MX";
+  }
+
+  // Under normal speed. Native pace is fine once you know a word,
+  // but it blurs the vowels while you're still learning it.
+  utterance.rate = 0.85;
+
+  utterance.onstart = function () { button.classList.add("speaking"); };
+  utterance.onend   = function () { button.classList.remove("speaking"); };
+  utterance.onerror = function () { button.classList.remove("speaking"); };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+function describeVoice() {
+  if (!TTS_SUPPORTED) return "This browser has no speech engine, so audio is off.";
+  if (!spanishVoice) {
+    return "No Spanish voice installed. Android: Settings > Accessibility > " +
+           "Text-to-speech > install Spanish (Mexico).";
+  }
+  const lang = normalizeLang(spanishVoice.lang);
+  if (lang === "es-MX" || lang === "es-US" || lang === "es-419") return "";
+  return "Using a " + lang + " voice. For Mexican Spanish, install Spanish (Mexico) " +
+         "in your device's text-to-speech settings.";
+}
+
+
+/* =================================================================
+   7. SESSION STATE
+   Not saved. An interrupted session just starts over.
+   ================================================================= */
+
+let queue = [];
+let current = null;
+let currentDirection = "en-es";
+let sessionRight = 0;
+let sessionWrong = 0;
+let retried = [];
+let freshIds = [];   // ids introduced for the first time this session
+let activeTrade = "All";
+
+
+/* =================================================================
+   8. SCREENS
+   ================================================================= */
+
+const el = {
+  totalCount:  document.getElementById("totalCount"),
+  gauge:       document.getElementById("gauge"),
+  filter:      document.getElementById("filter"),
+  homeScreen:  document.getElementById("homeScreen"),
+  homeBody:    document.getElementById("homeBody"),
+  studyScreen: document.getElementById("studyScreen"),
+  doneScreen:  document.getElementById("doneScreen"),
+  progress:    document.getElementById("progress"),
+  studyCard:   document.getElementById("studyCard"),
+  newFlag:     document.getElementById("newFlag"),
+  prompt:      document.getElementById("prompt"),
+  promptNote:  document.getElementById("promptNote"),
+  answerBlock: document.getElementById("answerBlock"),
+  answer:      document.getElementById("answer"),
+  regional:    document.getElementById("regional"),
+  promptSpeak: document.getElementById("promptSpeak"),
+  answerSpeak: document.getElementById("answerSpeak"),
+  voiceNote:   document.getElementById("voiceNote"),
+  flipBtn:     document.getElementById("flipBtn"),
+  verdict:     document.getElementById("verdict"),
+  doneSummary: document.getElementById("doneSummary"),
+  gotItBtn:    document.getElementById("gotItBtn"),
+  missedBtn:   document.getElementById("missedBtn"),
+  endBtn:      document.getElementById("endBtn"),
+  backBtn:     document.getElementById("backBtn")
+};
+
+function showScreen(name) {
+  el.homeScreen.classList.toggle("hidden", name !== "home");
+  el.studyScreen.classList.toggle("hidden", name !== "study");
+  el.doneScreen.classList.toggle("hidden", name !== "done");
+}
+
+function renderVoiceNote() {
+  const message = describeVoice();
+  el.voiceNote.textContent = message;
+  el.voiceNote.classList.toggle("hidden", message === "");
+}
+
+function renderGauge() {
+  const counts = getBoxCounts();
+  const highest = Math.max.apply(null, counts);
+  el.gauge.innerHTML = "";
+
+  counts.forEach(function (count) {
+    // Scale bars against the fullest box so the shape stays readable
+    // whether you've introduced 12 terms or 250.
+    const heightPercent = highest === 0 ? 0 : (count / highest) * 100;
+    const col = document.createElement("div");
+    col.className = "gauge-col";
+    col.innerHTML =
+      '<div class="gauge-bar" style="height:' + heightPercent + '%"></div>' +
+      '<div class="gauge-n">' + count + "</div>";
+    el.gauge.appendChild(col);
+  });
+}
+
+function renderFilter() {
+  const trades = ["All"].concat(getTrades());
+  el.filter.innerHTML = "";
+
+  trades.forEach(function (trade) {
+    const previous = activeTrade;
+    activeTrade = trade;
+    const waiting = getTermsDue().length + getNewTerms().length;
+    activeTrade = previous;
+
+    const chip = document.createElement("button");
+    chip.className = "chip" + (trade === activeTrade ? " active" : "");
+    chip.type = "button";
+    chip.innerHTML = trade + (waiting > 0 ? ' <span class="n">' + waiting + "</span>" : "");
+    chip.addEventListener("click", function () {
+      activeTrade = trade;
+      renderHome();
+    });
+    el.filter.appendChild(chip);
+  });
+}
+
+function renderHome() {
+  const due = getTermsDue();
+  const fresh = getNewTerms();
+  const introduced = state.terms.filter(function (t) { return t.introduced; }).length;
+
+  el.totalCount.textContent = introduced + " of " + state.terms.length + " started";
+  renderGauge();
+  renderFilter();
+
+  const waiting = due.length + fresh.length;
+
+  if (waiting === 0) {
+    const anyLeft = state.terms.some(function (t) { return !t.introduced; });
+    el.homeBody.innerHTML =
+      '<div class="empty">' +
+        '<p class="term long">Nothing due</p>' +
+        "<p>" + (anyLeft
+          ? "You've hit today's limit of " + NEW_PER_DAY + " new cards. More tomorrow."
+          : "Every card is scheduled. Boxes 4 and 5 take longer to come back.") +
+        "</p>" +
+      "</div>";
+  } else {
+    const parts = [];
+    if (due.length) parts.push(due.length + " to review");
+    if (fresh.length) parts.push(fresh.length + " new");
+
+    el.homeBody.innerHTML =
+      '<div class="stack">' +
+        '<p style="margin:0 0 0.25rem; color:var(--muted); font-size:0.8125rem">' +
+          parts.join(", ") +
+        "</p>" +
+        '<button class="btn-primary" id="startBtn">Start reviewing</button>' +
+      "</div>";
+    document.getElementById("startBtn").addEventListener("click", startSession);
+  }
+
+  showScreen("home");
+}
+
+
+/* =================================================================
+   9. RUNNING A SESSION
+   ================================================================= */
+
+function shuffle(array) {
+  // Fisher-Yates: walk backwards, swapping each item with a random
+  // earlier one. Every ordering is equally likely, which the simpler
+  // sort(() => Math.random() - 0.5) trick does not actually give you.
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
+  return array;
+}
+
+function startSession() {
+  const due = shuffle(getTermsDue().slice());
+  const fresh = getNewTerms();
+
+  // Mark the new ones as introduced up front and count them against
+  // today's allowance, so backing out mid-session doesn't hand you
+  // the same twelve cards again.
+  fresh.forEach(function (term) {
+    term.introduced = true;
+    term.nextReview = todayKey();
+  });
+  freshIds = fresh.map(function (term) { return term.id; });
+  state.newTracker.count += fresh.length;
+  save();
+
+  // Reviews first, then the new material. Warming up on words you've
+  // already seen is easier than opening cold on twelve unknowns.
+  queue = due.concat(shuffle(fresh));
+
+  sessionRight = 0;
+  sessionWrong = 0;
+  retried = [];
+  showScreen("study");
+  nextCard();
+}
+
+function nextCard() {
+  if (queue.length === 0) { finishSession(); return; }
+
+  current = queue.shift();
+
+  // Randomize the direction. Recognizing a word and producing it are
+  // different skills, and only one of them helps when you're the one
+  // giving the instruction.
+  currentDirection = Math.random() < 0.5 ? "en-es" : "es-en";
+
+  const promptText = currentDirection === "en-es" ? current.en : current.es;
+  const answerText = currentDirection === "en-es" ? current.es : current.en;
+
+  el.prompt.textContent = promptText;
+  el.answer.textContent = answerText;
+  el.promptNote.textContent = current.trade;
+
+  // Full phrases need smaller type than single words or they wrap
+  // into four lines on a phone.
+  el.prompt.className = "term" + (promptText.length > 18 ? " long" : "");
+  el.answer.className = "term" + (answerText.length > 18 ? " long" : "");
+  el.studyCard.classList.toggle("is-phrase", current.trade === "Phrases");
+
+  if (current.region) {
+    el.regional.textContent = current.region;
+    el.regional.classList.remove("hidden");
+  } else {
+    el.regional.classList.add("hidden");
+  }
+
+  // Flag only the cards being seen for the very first time, so you
+  // know to read the answer rather than strain to recall it.
+  el.newFlag.classList.toggle("hidden", freshIds.indexOf(current.id) === -1);
+
+  el.answerBlock.classList.add("hidden");
+  el.verdict.classList.add("hidden");
+  el.flipBtn.classList.remove("hidden");
+
+  // The speak button follows the Spanish, whichever side it's on.
+  el.promptSpeak.classList.toggle("hidden", currentDirection !== "es-en" || !TTS_SUPPORTED);
+  el.answerSpeak.classList.add("hidden");
+  renderVoiceNote();
+
+  const done = sessionRight + sessionWrong;
+  el.progress.textContent = "Card " + (done + 1) + " of " + (done + 1 + queue.length);
+}
+
+function flip() {
+  el.answerBlock.classList.remove("hidden");
+  el.flipBtn.classList.add("hidden");
+  el.verdict.classList.remove("hidden");
+
+  if (currentDirection === "en-es" && TTS_SUPPORTED) {
+    el.answerSpeak.classList.remove("hidden");
+    // Play once automatically. You've just committed to an answer,
+    // which is the moment the correct sound actually sticks.
+    speakSpanish(current.es, el.answerSpeak);
+  }
+}
+
+function markCorrect() {
+  if (current.box < MAX_BOX) current.box++;
+  current.nextReview = calculateNextReview(current.box);
+  sessionRight++;
+  finishCard();
+}
+
+function markWrong() {
+  current.box = 1;
+  current.nextReview = calculateNextReview(1);
+  sessionWrong++;
+
+  // Put a missed card back at the end of this session, but only once.
+  // The second look is where it sticks; unlimited retries would trap
+  // you on a single word.
+  if (retried.indexOf(current.id) === -1) {
+    retried.push(current.id);
+    queue.push(current);
+  }
+  finishCard();
+}
+
+function finishCard() {
+  save();
+  renderGauge();
+  nextCard();
+}
+
+function finishSession() {
+  const total = sessionRight + sessionWrong;
+  el.doneSummary.textContent = total === 0
+    ? "No cards reviewed."
+    : sessionRight + " right, " + sessionWrong + " missed, out of " + total + ".";
+  renderGauge();
+  showScreen("done");
+}
+
+
+/* =================================================================
+   10. WIRING IT UP
+   ================================================================= */
+
+el.promptSpeak.addEventListener("click", function () { speakSpanish(current.es, el.promptSpeak); });
+el.answerSpeak.addEventListener("click", function () { speakSpanish(current.es, el.answerSpeak); });
+el.flipBtn.addEventListener("click", flip);
+el.gotItBtn.addEventListener("click", markCorrect);
+el.missedBtn.addEventListener("click", markWrong);
+el.endBtn.addEventListener("click", renderHome);
+el.backBtn.addEventListener("click", renderHome);
+
+// Voices load asynchronously in Chrome, so the first getVoices()
+// call usually comes back empty. The browser fires voiceschanged
+// when the list is ready, which is when we get to pick properly.
+if (TTS_SUPPORTED) {
+  pickSpanishVoice();
+  window.speechSynthesis.addEventListener("voiceschanged", function () {
+    pickSpanishVoice();
+    renderVoiceNote();
+  });
+}
+
+load();
+renderHome();
+</script>
+</body>
+</html>
