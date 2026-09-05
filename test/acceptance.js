@@ -423,6 +423,22 @@ const FAKE_SPEECH = () => {
      'the tab bar is hidden during a session and returns after it',
      'visible -> off-screen -> visible');
 
+  // Revealing the answer must not move the prompt. Centring the whole
+  // group made the prompt jump upward at the exact moment you are reading
+  // it, so the card is a two-row grid with the prompt pinned to the split.
+  const jump = await page.evaluate(async () => {
+    document.querySelector('[data-tab="study"]').click();
+    document.getElementById('startBtn').click();
+    const p = document.getElementById('promptText');
+    const before = p.getBoundingClientRect().top;
+    document.getElementById('flipBtn').click();
+    const after = p.getBoundingClientRect().top;
+    document.getElementById('quitBtn').click();
+    return { before, after, delta: Math.abs(after - before) };
+  });
+  ok(jump.delta < 1, 'revealing the answer does not move the prompt',
+     'prompt top ' + jump.before.toFixed(1) + 'px -> ' + jump.after.toFixed(1) + 'px');
+
   await page.click('[data-tab="browse"]');
   const search = await page.evaluate(async () => {
     const input = document.getElementById('searchInput');
@@ -480,6 +496,74 @@ const FAKE_SPEECH = () => {
      new Set(emptyOnes.map(b => b.bg)).size === 1 && emptyOnes[0].bg !== emptyBox[0].bg,
      'a box holding zero cards paints a neutral rule, never a colour',
      'boxes 2-5 empty: ' + emptyOnes[0].h + 'px ' + emptyOnes[0].bg);
+
+  // The three deliberate homonyms must survive intact, and the trade label
+  // that disambiguates them must be on the card.
+  const homonyms = {};
+  deck.forEach(c => { (homonyms[c.es] = homonyms[c.es] || []).push(c.en + ' [' + c.trade + ']'); });
+  const wanted = ['la escalera', 'el nivel', 'la tierra'];
+  const kept = wanted.filter(es => homonyms[es] && homonyms[es].length === 2);
+  const tradeOnCard = await page.evaluate(() => {
+    document.querySelector('[data-tab="study"]').click();
+    document.getElementById('startBtn').click();
+    const t = document.getElementById('cardTrade');
+    const shown = t.textContent && t.offsetHeight > 0;
+    document.getElementById('quitBtn').click();
+    return shown;
+  });
+  ok(kept.length === 3 && tradeOnCard,
+     'the three intentional homonyms are intact and the trade label is on the card',
+     wanted.map(es => es + ' = ' + homonyms[es].length).join(', '));
+
+  // Green and red are reserved for got-it and missed-it. If they start
+  // decorating anything else they stop carrying meaning.
+  const styleSrc = SRC.slice(SRC.indexOf('<style>'), SRC.indexOf('</style>'));
+  const belowRootSrc = styleSrc.slice(styleSrc.indexOf('\n}', styleSrc.indexOf(':root {')));
+  const statusRules = belowRootSrc.split('\n').filter(l => /var\(--(go|no)[-)]/.test(l));
+  ok(statusRules.length === 2 && statusRules.every(l => /^\.btn--(go|no)\b/.test(l.trim())),
+     'green and red appear only on the got-it and missed-it buttons',
+     statusRules.length + ' rules, both .btn--go / .btn--no');
+
+  // Nested corner radii must decrease inward. Fully round shapes (pills,
+  // circles) are excluded: those read as a distinct shape, not as a corner
+  // that fails to match its parent's.
+  const sampleRadii = () => page.evaluate(() => {
+    const r = n => parseFloat(getComputedStyle(n).borderTopLeftRadius) || 0;
+    const shown = n => { const b = n.getBoundingClientRect(); return b.width > 0 && b.height > 0; };
+    // A shape whose radius reaches half its shortest side is a pill or a
+    // circle. Those read as their own shape rather than as a corner that
+    // failed to match its parent, so they are not part of this rule.
+    const isRound = n => {
+      const b = n.getBoundingClientRect();
+      return r(n) >= Math.min(b.width, b.height) / 2 - 0.5;
+    };
+    const bad = [];
+    document.querySelectorAll('*').forEach(n => {
+      if (!shown(n) || !r(n) || isRound(n)) return;
+      let a = n.parentElement;
+      while (a && (!shown(a) || !r(a) || isRound(a))) a = a.parentElement;
+      if (a && r(n) > r(a)) {
+        bad.push(n.className + ' ' + r(n) + 'px inside ' + a.className + ' ' + r(a) + 'px');
+      }
+    });
+    return bad;
+  });
+  let radii = [];
+  for (const t of ['study', 'listen', 'browse', 'stats']) {
+    await page.click(`[data-tab="${t}"]`);
+    await page.waitForTimeout(120);
+    radii = radii.concat(await sampleRadii());
+  }
+  await page.evaluate(() => {
+    document.querySelector('[data-tab="study"]').click();
+    document.getElementById('startBtn').click();
+    document.getElementById('flipBtn').click();
+  });
+  await page.waitForTimeout(300);
+  radii = radii.concat(await sampleRadii());
+  await page.evaluate(() => document.getElementById('quitBtn').click());
+  ok(radii.length === 0, 'nested corner radii decrease inward, on every screen',
+     radii.length ? radii.slice(0, 3).join(' | ') : 'no child radius exceeds its parent');
 
   /* ---- CSS discipline ---- */
   const styleBlock = SRC.slice(SRC.indexOf('<style>'), SRC.indexOf('</style>'));

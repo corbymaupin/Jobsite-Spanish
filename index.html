@@ -372,9 +372,14 @@ body.in-session { overflow: hidden; }
   color: var(--ink-faint); font: inherit; font-size: var(--t-sm); padding: var(--sp-1);
 }
 
+/* Two equal rows with the prompt sitting on the dividing line: the prompt
+   is bottom-aligned in the top half, the answer top-aligned in the bottom
+   half. Centring the whole group instead meant the prompt jumped upward
+   the moment the answer appeared, which is exactly when you are reading
+   it. */
 .card {
-  flex: 1; display: flex; flex-direction: column; justify-content: center;
-  align-items: center; text-align: center;
+  flex: 1; display: grid; grid-template-rows: 1fr 1fr;
+  justify-items: center; text-align: center;
   margin: var(--sp-4) 0;
   padding: var(--sp-6) var(--sp-4);
   background: var(--surface);
@@ -383,7 +388,10 @@ body.in-session { overflow: hidden; }
   box-shadow: var(--shadow-card);
   overflow-y: auto;
 }
+.card__front  { align-self: end; max-width: 100%; }
+.card__answer { align-self: start; }
 .card__tag {
+  display: block;
   font-size: var(--t-2xs); font-weight: 700; letter-spacing: 0.1em;
   text-transform: uppercase; color: var(--ink-faint);
   margin-bottom: var(--sp-4);
@@ -406,6 +414,7 @@ body.in-session { overflow: hidden; }
   background: var(--line-strong); border-radius: var(--r-xs);
 }
 .card__answer { width: 100%; }
+.card__answer > .card__rule { margin-left: auto; margin-right: auto; }
 .card__region {
   margin: var(--sp-4) 0 0; font-size: var(--t-sm); color: var(--ink-dim);
   max-width: 22rem;
@@ -428,7 +437,10 @@ body.in-session { overflow: hidden; }
 .speak.is-speaking { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
 
 .verdict { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
-.session__foot > * + * { margin-top: var(--sp-3); }
+/* No sibling margin here on purpose. Exactly one of the flip button and
+   the verdict pair is ever visible, and `> * + *` still applies to the
+   second child when the first is display:none - which changed the foot's
+   height on reveal and nudged the whole card, and with it the prompt. */
 
 /* ===================================================================
    LISTEN
@@ -713,6 +725,7 @@ body.in-session { overflow: hidden; }
   </div>
 
   <div class="card" id="studyCard">
+    <div class="card__front">
     <span class="card__new hidden" id="newFlag">New card</span>
     <span class="card__tag" id="cardTrade"></span>
     <p class="term" id="promptText"></p>
@@ -723,9 +736,10 @@ body.in-session { overflow: hidden; }
       </svg>
       Hear it
     </button>
+    </div>
 
     <div class="card__answer hidden" id="answerBlock">
-      <div class="card__rule" style="margin-left:auto;margin-right:auto"></div>
+      <div class="card__rule"></div>
       <p class="term" id="answerText"></p>
       <button class="speak hidden" id="answerSpeak" type="button">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -749,7 +763,7 @@ body.in-session { overflow: hidden; }
 
 <!-- ============ SESSION SUMMARY ============ -->
 <section class="session hidden" id="doneScreen" aria-label="Session complete">
-  <div class="card">
+  <div class="card" style="grid-template-rows: 1fr auto 1fr; align-content: center">
     <span class="card__tag">Session complete</span>
     <p class="term" id="doneHeadline">Deck clear</p>
     <p class="card__region" id="doneSummary" style="display:block"></p>
@@ -1733,7 +1747,6 @@ let currentDirection = "en-es";
 let answerShown = false;      // guards grading a card you haven't seen
 let sessionRight = 0;
 let sessionWrong = 0;
-let sessionTotal = 0;
 let retried = [];
 let freshIds = [];
 let studyTrade = "All";
@@ -1962,7 +1975,6 @@ function startSession() {
 
   sessionRight = 0;
   sessionWrong = 0;
-  sessionTotal = queue.length;
   retried = [];
 
   el.body.classList.add("in-session");
@@ -2558,12 +2570,6 @@ function savePrefsAndRestart() {
 /* =================================================================
    15. WIRING IT UP
    ================================================================= */
-
-function renderAll() {
-  renderStudy();
-  if (activeTab === "browse") renderBrowse();
-  if (activeTab === "stats") renderStats();
-}
 
 el.tabbar.addEventListener("click", function (event) {
   const btn = event.target.closest(".tabbar__btn");
