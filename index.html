@@ -2,191 +2,764 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<!-- viewport-fit=cover lets the page paint into the notch and home-indicator
+     areas. Without it iOS letterboxes the whole app in black bars. It is only
+     half the job: everything fixed to an edge also needs env(safe-area-inset-*)
+     padding, further down, or it sits under the notch. -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Paints the phone's browser chrome to match the app. Without it Safari and
+     Chrome show a white strip above a near-black page, which is the single
+     loudest "this is a web page" tell on mobile. -->
+<meta name="theme-color" content="#0B0C0E">
+<meta name="color-scheme" content="dark">
+<!-- The iOS half of "Add to Home Screen". No manifest file, no build step:
+     these three tags are all iOS reads. -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Jobsite">
 <title>Jobsite Spanish</title>
 <style>
-  :root {
-    --concrete:   #E8E6E1;
-    --card:       #FFFFFF;
-    --ink:        #16181D;
-    --muted:      #6B6F76;
-    --hairline:   #CFCCC5;
-    --vial:       #FFC400;
-    --got-it:     #1F7A4D;
-    --missed:     #B3261E;
+/* ===================================================================
+   TOKENS
 
-    --step-0: 0.8125rem;
-    --step-1: 1rem;
-    --step-2: 1.375rem;
-    --step-3: 2.5rem;
+   Every colour, radius, shadow and type size in this file is declared
+   here and nowhere else. Further down there is not a single hex value,
+   rgba() or hardcoded px font-size - only var(). That is the point:
+   changing the orange means editing one line, not hunting forty rules.
+
+   Contrast was measured, not eyeballed. Against --surface:
+     --ink        16.3 : 1
+     --ink-dim     8.5 : 1
+     --ink-faint   5.3 : 1     (still over the 4.5 body-text minimum)
+     --accent      6.2 : 1
+   =================================================================== */
+:root {
+  /* --- ground and surfaces: near-black, three steps of lift --- */
+  --bg:           #0B0C0E;
+  --surface:      #16181C;
+  --surface-2:    #1F2329;
+  --surface-3:    #272C33;
+
+  /* --- hairlines. --line is decorative, --line-strong carries meaning
+         (input edges, chip outlines) and is lifted far enough to find. --- */
+  --line:         #2E333B;
+  --line-strong:  #5B636E;
+
+  /* --- text --- */
+  --ink:          #F4F5F7;
+  --ink-dim:      #AEB4BE;
+  --ink-faint:    #868D98;
+  --on-accent:    #14100C;   /* near-black text that sits on orange fills */
+
+  /* --- safety orange, the one accent --- */
+  --accent:       #FF6A00;
+  --accent-lit:   #FF8A33;   /* top of the button gradient */
+  --accent-deep:  #A03D00;   /* the button's thickness, seen from above */
+  --accent-wash:  #2A1A0E;   /* tinted surface for accent-flavoured blocks */
+
+  /* --- status. Reserved for "got it" and "missed it" and used nowhere
+         else in the app. The moment green decorates something it stops
+         meaning correct. --- */
+  --go:           #34C77B;
+  --go-deep:      #1B6E42;
+  --no:           #EF5B55;
+  --no-deep:      #8E2C28;
+
+  /* --- the Leitner ramp: ONE hue, five steps dim to bright. Five
+         different colours would say five kinds of thing; a ramp says a
+         direction, which is the whole content of that chart. --- */
+  --box-1:        #8a5026;
+  --box-2:        #ab6227;
+  --box-3:        #d67826;
+  --box-4:        #f38f42;
+  --box-5:        #ffab6b;
+  --box-empty:    #3A4049;   /* neutral rule for a box holding nothing */
+
+  /* --- type scale --- */
+  --t-2xs:   0.6875rem;
+  --t-xs:    0.75rem;
+  --t-sm:    0.8125rem;
+  --t-md:    0.9375rem;
+  --t-base:  1rem;
+  --t-lg:    1.1875rem;
+  --t-xl:    1.5rem;
+  --t-2xl:   2.125rem;
+  --t-3xl:   2.75rem;
+
+  /* --- radii. Nested corners step DOWN going inward; a 12px radius
+         inside a 12px radius reads as a mistake. --- */
+  --r-xl:  20px;
+  --r-lg:  14px;
+  --r-md:  10px;
+  --r-sm:  7px;
+  --r-xs:  4px;
+  --r-pill: 999px;
+
+  /* --- spacing --- */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.25rem;
+  --sp-6: 1.75rem;
+  --sp-7: 2.5rem;
+
+  /* --- shadows. Declared whole so no rule below writes a colour. --- */
+  --press-depth: 4px;
+  --shadow-cast:  0 6px 16px rgba(0,0,0,0.45);
+  --shadow-card:  0 12px 28px rgba(0,0,0,0.38);
+  --shadow-bar:   0 -1px 0 var(--line);
+  --btn-highlight: rgba(255,255,255,0.28);
+  --btn-sheen:     rgba(255,255,255,0.10);
+  --focus-ring:    var(--accent-lit);
+  --scrim:         rgba(11,12,14,0.72);
+
+  /* --- motion --- */
+  --ease: cubic-bezier(0.2, 0.8, 0.3, 1);
+  --fast: 130ms;
+  --slow: 260ms;
+
+  /* --- layout --- */
+  --bar-h:  3.25rem;
+  --tab-h:  3.5rem;
+  --measure: 34rem;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  background: var(--bg);
+  /* Kills the rubber-band scroll that exposes the browser's own
+     background behind the app. */
+  overscroll-behavior: none;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: var(--t-base);
+  line-height: 1.45;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+.hidden { display: none !important; }
+.tnum { font-variant-numeric: tabular-nums; }
+
+:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+/* ===================================================================
+   APP BAR
+   =================================================================== */
+.app-bar {
+  position: fixed; inset: 0 0 auto 0; z-index: 20;
+  display: flex; align-items: center; gap: var(--sp-3);
+  height: calc(var(--bar-h) + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) var(--sp-5) 0;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  transition: transform var(--slow) var(--ease);
+}
+.app-bar__mark { flex: none; display: block; }
+.app-bar__name {
+  margin: 0; font-size: var(--t-md); font-weight: 800;
+  letter-spacing: 0.02em; text-transform: uppercase;
+}
+.app-bar__count {
+  margin-left: auto; font-size: var(--t-2xs); color: var(--ink-faint);
+  letter-spacing: 0.04em;
+}
+
+/* The one hazard stripe in the app. Repeated anywhere else it becomes a
+   theme; used once it reads as a deliberate mark. */
+.hazard {
+  position: absolute; left: 0; right: 0; bottom: -3px; height: 3px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--accent) 0 6px,
+    var(--bg) 6px 12px
+  );
+}
+
+/* ===================================================================
+   TAB BAR
+   =================================================================== */
+.tabbar {
+  position: fixed; inset: auto 0 0 0; z-index: 20;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--scrim);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: var(--shadow-bar);
+  transition: transform var(--slow) var(--ease);
+}
+.tabbar__btn {
+  appearance: none; background: none; border: 0; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 3px;
+  height: var(--tab-h); padding: 0;
+  color: var(--ink-faint);
+  font: inherit; font-size: var(--t-2xs); font-weight: 600;
+  letter-spacing: 0.03em;
+  -webkit-tap-highlight-color: transparent;
+  transition: color var(--fast) var(--ease);
+}
+.tabbar__btn[aria-selected="true"] { color: var(--accent); }
+.tabbar__btn svg { display: block; }
+
+/* ===================================================================
+   LAYOUT
+   =================================================================== */
+.scroller {
+  padding-top: calc(var(--bar-h) + env(safe-area-inset-top) + var(--sp-5));
+  padding-bottom: calc(var(--tab-h) + env(safe-area-inset-bottom) + var(--sp-7));
+  padding-left: var(--sp-5); padding-right: var(--sp-5);
+  max-width: var(--measure); margin: 0 auto;
+}
+.panel > * + * { margin-top: var(--sp-5); }
+
+.section-label {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--t-2xs); font-weight: 700; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--ink-faint);
+}
+
+.block {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  padding: var(--sp-5);
+}
+/* Anything nested in a --r-xl block gets --r-lg, and its children --r-md.
+   Radii decrease inward; equal radii at two depths is the loudest tell of
+   an unpolished interface. */
+.block .inset {
+  background: var(--surface-2);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4);
+}
+.block .inset .inset-2 { border-radius: var(--r-md); }
+
+.muted { color: var(--ink-dim); }
+.faint { color: var(--ink-faint); }
+.tiny  { font-size: var(--t-sm); }
+
+/* ===================================================================
+   BUTTONS
+
+   The feel: a solid, UNBLURRED offset shadow in a darker shade of the
+   button's own colour is the side of the button you would see from
+   slightly above. A 1px inset highlight along the top edge is the light
+   catching that edge. A soft cast shadow underneath separates it from
+   the page. On :active the face translates down by the thickness and the
+   thickness compresses to match, so the button goes *down* rather than
+   just changing colour.
+
+   Each variant only sets four custom properties; the mechanics live once.
+   =================================================================== */
+.btn {
+  --face:  var(--surface-2);
+  --edge:  var(--bg);
+  --label: var(--ink);
+
+  appearance: none; display: flex; align-items: center; justify-content: center;
+  gap: var(--sp-2); width: 100%; cursor: pointer; border: 0;
+  padding: var(--sp-4) var(--sp-5);
+  font: inherit; font-size: var(--t-base); font-weight: 700;
+  color: var(--label);
+  border-radius: var(--r-md);
+  background-color: var(--face);
+  background-image: linear-gradient(180deg, var(--btn-sheen), transparent 55%);
+  box-shadow:
+    inset 0 1px 0 var(--btn-highlight),
+    0 var(--press-depth) 0 var(--edge),
+    var(--shadow-cast);
+  transform: translateY(0);
+  transition: transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+  text-align: center;
+}
+.btn:active {
+  transform: translateY(var(--press-depth));
+  box-shadow:
+    inset 0 1px 0 var(--btn-highlight),
+    0 0 0 var(--edge),
+    var(--shadow-bar);
+}
+.btn[disabled] { opacity: 0.45; pointer-events: none; }
+
+.btn--accent { --face: var(--accent); --edge: var(--accent-deep); --label: var(--on-accent);
+               background-image: linear-gradient(180deg, var(--accent-lit), var(--accent) 60%); }
+.btn--go     { --face: var(--go);  --edge: var(--go-deep);  --label: var(--on-accent); }
+.btn--no     { --face: var(--no);  --edge: var(--no-deep);  --label: var(--on-accent); }
+.btn--quiet  { --face: var(--surface-2); --edge: var(--bg); --label: var(--ink-dim);
+               font-size: var(--t-md); padding: var(--sp-3) var(--sp-4); }
+.btn--lg     { font-size: var(--t-lg); padding: var(--sp-5); border-radius: var(--r-lg); }
+
+/* ===================================================================
+   CHIPS
+   =================================================================== */
+.chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.chip {
+  appearance: none; cursor: pointer;
+  padding: 0.4375rem var(--sp-3);
+  font: inherit; font-size: var(--t-sm); font-weight: 600;
+  color: var(--ink-dim);
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+.chip[aria-pressed="true"] {
+  background: var(--accent); border-color: var(--accent); color: var(--on-accent);
+}
+.chip__n { opacity: 0.65; font-variant-numeric: tabular-nums; }
+
+/* ===================================================================
+   STUDY TAB
+   =================================================================== */
+.today { display: flex; align-items: flex-end; gap: var(--sp-5); }
+.today__n {
+  font-size: var(--t-3xl); font-weight: 800; line-height: 0.95;
+  letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+}
+.today__n--due { color: var(--accent); }
+.today__lab {
+  display: block; margin-top: var(--sp-1);
+  font-size: var(--t-2xs); font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--ink-faint);
+}
+
+/* Compact progress: the same ramp as the Stats chart, one slim row.
+   Hidden entirely until something has been introduced - an empty chart
+   on day one reads as broken rather than as new. */
+.ramp { display: flex; gap: 2px; height: 6px; }
+.ramp__seg { border-radius: var(--r-xs); }
+
+/* ===================================================================
+   SESSION - full screen, tab bar gone
+   =================================================================== */
+.session {
+  position: fixed; inset: 0; z-index: 30;
+  display: flex; flex-direction: column;
+  padding: calc(env(safe-area-inset-top) + var(--sp-5)) var(--sp-5)
+           calc(env(safe-area-inset-bottom) + var(--sp-5));
+  background: var(--bg);
+}
+body.in-session .app-bar { transform: translateY(-120%); }
+body.in-session .tabbar  { transform: translateY(120%); }
+body.in-session { overflow: hidden; }
+
+.session__top {
+  display: flex; align-items: center; gap: var(--sp-3);
+  font-size: var(--t-sm); color: var(--ink-faint);
+}
+.session__bar {
+  flex: 1; height: 4px; border-radius: var(--r-xs);
+  background: var(--surface-2); overflow: hidden;
+}
+.session__fill {
+  height: 100%; background: var(--accent); border-radius: var(--r-xs);
+  transition: width var(--slow) var(--ease);
+}
+.session__quit {
+  appearance: none; border: 0; background: none; cursor: pointer;
+  color: var(--ink-faint); font: inherit; font-size: var(--t-sm); padding: var(--sp-1);
+}
+
+.card {
+  flex: 1; display: flex; flex-direction: column; justify-content: center;
+  align-items: center; text-align: center;
+  margin: var(--sp-4) 0;
+  padding: var(--sp-6) var(--sp-4);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-card);
+  overflow-y: auto;
+}
+.card__tag {
+  font-size: var(--t-2xs); font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-faint);
+  margin-bottom: var(--sp-4);
+}
+.card__new {
+  display: inline-block; margin-bottom: var(--sp-3);
+  padding: 2px var(--sp-2);
+  font-size: var(--t-2xs); font-weight: 800; letter-spacing: 0.06em;
+  color: var(--on-accent); background: var(--accent);
+  border-radius: var(--r-xs);
+}
+.term {
+  margin: 0; font-size: var(--t-3xl); font-weight: 800;
+  letter-spacing: -0.03em; line-height: 1.1; overflow-wrap: break-word;
+  max-width: 100%;
+}
+.term--long { font-size: var(--t-xl); letter-spacing: -0.01em; }
+.card__rule {
+  width: 3rem; height: 2px; margin: var(--sp-5) 0;
+  background: var(--line-strong); border-radius: var(--r-xs);
+}
+.card__answer { width: 100%; }
+.card__region {
+  margin: var(--sp-4) 0 0; font-size: var(--t-sm); color: var(--ink-dim);
+  max-width: 22rem;
+}
+
+/* Reveal: a short rise and fade. Not a 3D flip - at 44px type a flip is
+   a full-card repaint and reads as motion sickness on a phone. */
+@keyframes reveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.card__answer { animation: reveal var(--slow) var(--ease) both; }
+
+.speak {
+  appearance: none; cursor: pointer;
+  display: inline-flex; align-items: center; gap: var(--sp-2);
+  margin-top: var(--sp-4); padding: var(--sp-2) var(--sp-3);
+  font: inherit; font-size: var(--t-sm); font-weight: 600;
+  color: var(--ink-dim); background: var(--surface-2);
+  border: 1px solid var(--line-strong); border-radius: var(--r-pill);
+  -webkit-tap-highlight-color: transparent;
+}
+.speak.is-speaking { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
+
+.verdict { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+.session__foot > * + * { margin-top: var(--sp-3); }
+
+/* ===================================================================
+   LISTEN
+   =================================================================== */
+.transport {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center; gap: var(--sp-4);
+}
+/* Sized to be hit without looking. The driver is not aiming. */
+.transport__play {
+  --face: var(--accent); --edge: var(--accent-deep); --label: var(--on-accent);
+  width: 6.5rem; height: 6.5rem; border-radius: var(--r-pill);
+  padding: 0; background-image: linear-gradient(180deg, var(--accent-lit), var(--accent) 60%);
+}
+.transport__skip {
+  --face: var(--surface-2); --edge: var(--bg); --label: var(--ink);
+  height: 4.5rem; border-radius: var(--r-lg); padding: 0;
+}
+.now-playing { text-align: center; min-height: 4.5rem; }
+.now-playing__side { font-size: var(--t-xl); font-weight: 700; letter-spacing: -0.02em; }
+.now-playing__other { margin-top: var(--sp-2); font-size: var(--t-md); color: var(--ink-faint); }
+
+.opt { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
+.opt + .opt { margin-top: var(--sp-4); }
+.opt__label { font-size: var(--t-md); font-weight: 600; }
+.opt__hint { display: block; font-size: var(--t-xs); color: var(--ink-faint); font-weight: 400; }
+.seg { display: flex; gap: 2px; padding: 2px; background: var(--surface-3); border-radius: var(--r-md); }
+.seg__btn {
+  appearance: none; border: 0; cursor: pointer;
+  padding: var(--sp-2) var(--sp-3);
+  font: inherit; font-size: var(--t-sm); font-weight: 600;
+  color: var(--ink-dim); background: none; border-radius: var(--r-sm);
+  -webkit-tap-highlight-color: transparent; white-space: nowrap;
+}
+.seg__btn[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.status-line {
+  display: flex; align-items: flex-start; gap: var(--sp-2);
+  font-size: var(--t-xs); color: var(--ink-faint); line-height: 1.4;
+}
+.status-line__dot {
+  flex: none; width: 7px; height: 7px; margin-top: 5px;
+  border-radius: var(--r-pill); background: var(--line-strong);
+}
+.status-line--on .status-line__dot { background: var(--accent); }
+
+/* ===================================================================
+   BROWSE
+   =================================================================== */
+.search {
+  width: 100%; padding: var(--sp-3) var(--sp-4);
+  font: inherit; font-size: var(--t-base); color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong); border-radius: var(--r-lg);
+}
+.search::placeholder { color: var(--ink-faint); }
+
+.rows { list-style: none; margin: 0; padding: 0; }
+.row {
+  display: flex; align-items: stretch; gap: var(--sp-3);
+  padding: var(--sp-3) 0; border-bottom: 1px solid var(--line);
+}
+.row__main { flex: 1; min-width: 0; }
+/* Block, not inline: as inline spans the Spanish ran straight into the
+   trade label with no break. */
+.row__en   { display: block; font-size: var(--t-md); font-weight: 600; }
+.row__es   { display: block; font-size: var(--t-md); color: var(--accent); }
+.row__meta { display: block; font-size: var(--t-xs); color: var(--ink-faint); margin-top: 2px; }
+/* The box shows as a colour rule from the same ramp, with the number in
+   the muted meta line. A number printed on box 1's dark brown would not
+   have carried, and colouring text beside a coloured mark is the thing
+   that turns a chart into soup. */
+.row__box {
+  flex: none; width: 3px; border-radius: var(--r-xs); background: var(--box-empty);
+}
+.row__speak {
+  flex: none; appearance: none; cursor: pointer;
+  width: 2.25rem; height: 2.25rem; display: grid; place-items: center;
+  color: var(--ink-dim); background: var(--surface-2);
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  -webkit-tap-highlight-color: transparent;
+}
+.row__speak.is-speaking { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
+
+/* ===================================================================
+   STATS
+   =================================================================== */
+.streak { display: flex; align-items: baseline; gap: var(--sp-3); }
+.streak__n {
+  font-size: var(--t-3xl); font-weight: 800; letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Bars share a baseline, round 4px at the TOP ONLY. Rounding the bottom
+   floats the bar off the baseline and makes short bars read as taller
+   than they are. 2px gap so adjacent fills don't merge into one shape. */
+.gauge { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; }
+.gauge__col { display: flex; flex-direction: column; }
+.gauge__plot { height: 7rem; display: flex; align-items: flex-end; }
+.gauge__bar { width: 100%; border-radius: var(--r-xs) var(--r-xs) 0 0; }
+/* A box holding zero cards gets a neutral rule, never a colour. A 3px
+   orange line at the baseline reads as a small value when the true
+   answer is "nothing". */
+.gauge__bar--empty { height: 2px; background: var(--box-empty); border-radius: 0; }
+/* Numbers stay muted. The mark carries identity, the text states a
+   value; colouring both turns the chart into soup. */
+.gauge__n { margin-top: var(--sp-2); font-size: var(--t-2xs); color: var(--ink-faint);
+            text-align: center; font-variant-numeric: tabular-nums; }
+.gauge__k { font-size: var(--t-2xs); color: var(--ink-faint); text-align: center; }
+
+.meters > * + * { margin-top: var(--sp-3); }
+.meter__head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: var(--t-sm); margin-bottom: var(--sp-1);
+}
+.meter__n { color: var(--ink-faint); font-size: var(--t-xs); font-variant-numeric: tabular-nums; }
+.meter__track { height: 6px; background: var(--surface-3); border-radius: var(--r-xs); overflow: hidden; }
+.meter__fill { height: 100%; background: var(--accent); }
+
+.empty-state { text-align: center; padding: var(--sp-6) var(--sp-4); }
+.empty-state__title { font-size: var(--t-xl); font-weight: 800; letter-spacing: -0.02em; margin: 0; }
+.empty-state__body { margin: var(--sp-3) 0 0; color: var(--ink-dim); font-size: var(--t-md); }
+
+.export {
+  width: 100%; height: 7rem; margin-top: var(--sp-3);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: var(--t-xs);
+  color: var(--ink-dim); background: var(--surface-2);
+  border: 1px solid var(--line-strong); border-radius: var(--r-md);
+  padding: var(--sp-3); resize: vertical;
+}
+
+/* ===================================================================
+   REDUCED MOTION - not optional
+   =================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
-
-  * { box-sizing: border-box; }
-
-  html, body {
-    margin: 0; padding: 0;
-    background: var(--concrete);
-    color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-size: var(--step-1);
-    line-height: 1.45;
-    -webkit-text-size-adjust: 100%;
-  }
-
-  .wrap { max-width: 34rem; margin: 0 auto; padding: 1.25rem 1.125rem 3rem; }
-
-  .masthead {
-    display: flex; align-items: baseline; justify-content: space-between;
-    gap: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--ink);
-  }
-  .masthead h1 { margin: 0; font-size: var(--step-2); font-weight: 800; letter-spacing: -0.02em; }
-  .masthead .count { font-size: var(--step-0); color: var(--muted); font-variant-numeric: tabular-nums; }
-
-  /* Five bars, one per Leitner box. Left is what you keep missing,
-     right is what you know cold. Weight shifting right over weeks
-     is the only progress signal that matters here. */
-  .gauge {
-    display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.375rem;
-    margin: 1.25rem 0 1.5rem; align-items: end; height: 4.5rem;
-  }
-  .gauge-col { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; text-align: center; }
-  .gauge-bar { background: var(--ink); border-radius: 2px 2px 0 0; min-height: 3px; transition: height 200ms ease; }
-  .gauge-col:nth-child(5) .gauge-bar { background: var(--got-it); }
-  .gauge-n { font-size: 0.6875rem; color: var(--muted); padding-top: 0.3125rem; font-variant-numeric: tabular-nums; }
-
-  /* Trade filter. With 240 terms you rarely want the whole deck at
-     once, and drilling one trade before a specific day's work is
-     more useful than a random shuffle across everything. */
-  .filter { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-bottom: 1.25rem; }
-  .chip {
-    width: auto; padding: 0.4375rem 0.75rem; font-size: 0.8125rem; font-weight: 600;
-    background: transparent; color: var(--muted);
-    border: 1px solid var(--hairline); border-radius: 999px;
-  }
-  .chip.active { background: var(--ink); color: #fff; border-color: var(--ink); }
-  .chip .n { opacity: 0.6; font-variant-numeric: tabular-nums; }
-
-  .card {
-    background: var(--card); border: 1px solid var(--hairline);
-    border-top: 4px solid var(--ink); padding: 2rem 1.375rem; text-align: center;
-  }
-  .card.is-phrase { border-top-color: var(--vial); }
-
-  .term { font-size: var(--step-3); font-weight: 800; letter-spacing: -0.03em; line-height: 1.12; margin: 0; word-wrap: break-word; }
-  .term.long { font-size: 1.625rem; letter-spacing: -0.02em; }
-  .side-note { font-size: var(--step-0); color: var(--muted); margin: 0.625rem 0 0; }
-
-  .answer { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed var(--hairline); }
-  .regional { font-size: var(--step-0); color: var(--muted); margin: 0.75rem 0 0; font-style: italic; }
-
-  button { font: inherit; font-weight: 700; border: none; border-radius: 4px; padding: 1.0625rem 1.25rem; width: 100%; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-  button:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
-
-  .btn-primary { background: var(--vial); color: var(--ink); }
-  .btn-flip    { background: var(--ink); color: #fff; margin-top: 1.75rem; }
-  .btn-quiet   { background: transparent; color: var(--muted); font-weight: 600; border: 1px solid var(--hairline); padding: 0.75rem; }
-
-  .verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem; margin-top: 1.75rem; }
-  .btn-missed { background: var(--missed); color: #fff; }
-  .btn-got-it { background: var(--got-it); color: #fff; }
-
-  .speak-btn {
-    display: inline-flex; align-items: center; gap: 0.4375rem; width: auto;
-    margin: 0.875rem auto 0; padding: 0.5rem 0.9375rem;
-    background: transparent; color: var(--ink);
-    border: 1px solid var(--hairline); border-radius: 999px;
-    font-size: 0.8125rem; font-weight: 600;
-  }
-  .speak-btn:active { background: var(--concrete); }
-  .speak-btn.speaking { background: var(--ink); color: #fff; border-color: var(--ink); }
-  .speak-btn svg { flex-shrink: 0; }
-
-  .voice-note { font-size: 0.75rem; color: var(--muted); text-align: center; margin: 0.875rem 0 0; line-height: 1.4; }
-
-  .new-flag {
-    display: inline-block; font-size: 0.6875rem; font-weight: 700;
-    background: var(--vial); color: var(--ink);
-    padding: 0.1875rem 0.5rem; border-radius: 3px; margin-bottom: 0.875rem;
-  }
-
-  .stack > * + * { margin-top: 0.75rem; }
-  .spacer { height: 1.75rem; }
-
-  .progress { font-size: var(--step-0); color: var(--muted); text-align: center; margin-bottom: 0.875rem; font-variant-numeric: tabular-nums; }
-  .empty { text-align: center; padding: 2rem 1rem; }
-  .empty p { color: var(--muted); margin: 0.5rem 0 0; }
-  .hidden { display: none; }
-
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+}
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <div class="masthead">
-    <h1>Jobsite Spanish</h1>
-    <span class="count" id="totalCount"></span>
-  </div>
+<header class="app-bar" id="appBar">
+  <!-- The mark: a chevron stepping up, the same "one direction" idea the
+       Leitner ramp carries. currentColor and var() only, so the logo
+       follows the palette like everything else. -->
+  <svg class="app-bar__mark" width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+    <rect width="26" height="26" rx="7" fill="var(--accent)"/>
+    <path d="M6.5 16.5 13 9.5l6.5 7" fill="none" stroke="var(--on-accent)"
+          stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <h1 class="app-bar__name">Jobsite Spanish</h1>
+  <span class="app-bar__count tnum" id="deckCount"></span>
+  <div class="hazard"></div>
+</header>
 
-  <div class="gauge" id="gauge"></div>
-
-  <section id="homeScreen">
-    <div class="filter" id="filter"></div>
-    <div id="homeBody"></div>
+<main>
+  <!-- ============ STUDY ============ -->
+  <section class="scroller panel" id="panel-study" role="tabpanel" aria-label="Study">
+    <div class="block" id="todayBlock"></div>
+    <div>
+      <p class="section-label">Trade</p>
+      <div class="chips" id="tradeChips"></div>
+    </div>
   </section>
 
-  <section id="studyScreen" class="hidden">
-    <p class="progress" id="progress"></p>
-    <div class="card" id="studyCard">
-      <span class="new-flag hidden" id="newFlag">New</span>
-      <p class="term" id="prompt"></p>
+  <!-- ============ LISTEN ============ -->
+  <section class="scroller panel hidden" id="panel-listen" role="tabpanel" aria-label="Listen">
+    <div class="block">
+      <div class="now-playing" id="nowPlaying">
+        <div class="now-playing__side faint">Hands-free drilling</div>
+        <div class="now-playing__other">Plays both sides of a card, then moves on by itself.</div>
+      </div>
+      <div class="transport" style="margin-top: var(--sp-5)">
+        <button class="btn transport__skip" id="listenPrev" type="button" aria-label="Previous card">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M18 5v14l-11-7z"/><rect x="5" y="5" width="2.5" height="14" rx="1"/>
+          </svg>
+        </button>
+        <button class="btn transport__play" id="listenPlay" type="button" aria-label="Play">
+          <svg id="listenIcon" width="42" height="42" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M8 5.5v13l11-6.5z"/>
+          </svg>
+        </button>
+        <button class="btn transport__skip" id="listenNext" type="button" aria-label="Next card">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M6 5v14l11-7z"/><rect x="16.5" y="5" width="2.5" height="14" rx="1"/>
+          </svg>
+        </button>
+      </div>
+      <div style="margin-top: var(--sp-5)">
+        <div class="status-line" id="wakeStatus"><span class="status-line__dot"></span><span></span></div>
+        <div class="status-line" id="listenVoiceStatus" style="margin-top: var(--sp-2)"><span class="status-line__dot"></span><span></span></div>
+      </div>
+    </div>
 
-      <button class="speak-btn hidden" id="promptSpeak" type="button">
+    <div class="block">
+      <p class="section-label">Settings</p>
+      <div class="opt">
+        <span class="opt__label">Order<span class="opt__hint">Which side plays first</span></span>
+        <div class="seg" id="optOrder"></div>
+      </div>
+      <div class="opt">
+        <span class="opt__label">Gap<span class="opt__hint">Your answering window</span></span>
+        <div class="seg" id="optGap"></div>
+      </div>
+      <div class="opt">
+        <span class="opt__label">Repeat Spanish<span class="opt__hint">Say it twice before moving on</span></span>
+        <div class="seg" id="optRepeat"></div>
+      </div>
+      <div class="opt">
+        <span class="opt__label">Deck<span class="opt__hint">What to draw from</span></span>
+        <div class="seg" id="optDeck"></div>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-label">Trade</p>
+      <div class="chips" id="listenChips"></div>
+    </div>
+
+    <p class="tiny faint" style="margin:0">
+      Listening never grades a card or moves it between boxes. You cannot honestly
+      assess yourself at 70&nbsp;mph, and dishonest grades would wreck the schedule
+      that makes the Study side work.
+    </p>
+  </section>
+
+  <!-- ============ BROWSE ============ -->
+  <section class="scroller panel hidden" id="panel-browse" role="tabpanel" aria-label="Browse">
+    <input class="search" id="searchInput" type="search" autocomplete="off"
+           placeholder="shackle, la eslinga, tablaroca&hellip;" aria-label="Search the deck">
+    <p class="tiny faint tnum" id="searchCount" style="margin:0"></p>
+    <ul class="rows" id="browseRows"></ul>
+  </section>
+
+  <!-- ============ STATS ============ -->
+  <section class="scroller panel hidden" id="panel-stats" role="tabpanel" aria-label="Stats">
+    <div class="block">
+      <div class="streak">
+        <span class="streak__n" id="streakN">0</span>
+        <span class="faint tiny" id="streakLabel">day streak</span>
+      </div>
+    </div>
+
+    <div class="block">
+      <p class="section-label">Leitner boxes</p>
+      <div class="gauge" id="gauge"></div>
+      <p class="tiny faint" style="margin: var(--sp-4) 0 0" id="gaugeNote"></p>
+    </div>
+
+    <div class="block">
+      <p class="section-label">By trade</p>
+      <div class="meters" id="tradeMeters"></div>
+    </div>
+
+    <div class="block">
+      <p class="section-label">Speech</p>
+      <div class="status-line" id="voiceDiag"><span class="status-line__dot"></span><span></span></div>
+      <div class="status-line" id="voiceDiagEn" style="margin-top: var(--sp-2)"><span class="status-line__dot"></span><span></span></div>
+    </div>
+
+    <div class="block">
+      <p class="section-label">Your data</p>
+      <button class="btn btn--quiet" id="exportBtn" type="button">Export progress</button>
+      <textarea class="export hidden" id="exportBox" readonly aria-label="Exported progress"></textarea>
+      <button class="btn btn--quiet" id="resetBtn" type="button" style="margin-top: var(--sp-3)">Reset all progress</button>
+    </div>
+  </section>
+</main>
+
+<!-- ============ SESSION (full screen, over everything) ============ -->
+<section class="session hidden" id="sessionScreen" aria-label="Review session">
+  <div class="session__top">
+    <span class="tnum" id="sessionProgress"></span>
+    <span class="session__bar"><span class="session__fill" id="sessionFill" style="width:0%"></span></span>
+    <button class="session__quit" id="quitBtn" type="button">End</button>
+  </div>
+
+  <div class="card" id="studyCard">
+    <span class="card__new hidden" id="newFlag">New card</span>
+    <span class="card__tag" id="cardTrade"></span>
+    <p class="term" id="promptText"></p>
+    <button class="speak hidden" id="promptSpeak" type="button">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/>
+      </svg>
+      Hear it
+    </button>
+
+    <div class="card__answer hidden" id="answerBlock">
+      <div class="card__rule" style="margin-left:auto;margin-right:auto"></div>
+      <p class="term" id="answerText"></p>
+      <button class="speak hidden" id="answerSpeak" type="button">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/>
         </svg>
         Hear it
       </button>
-
-      <p class="side-note" id="promptNote"></p>
-
-      <div class="answer hidden" id="answerBlock">
-        <p class="term" id="answer"></p>
-        <button class="speak-btn hidden" id="answerSpeak" type="button">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/>
-          </svg>
-          Hear it
-        </button>
-        <p class="regional hidden" id="regional"></p>
-      </div>
+      <p class="card__region hidden" id="regionText"></p>
     </div>
+  </div>
 
-    <p class="voice-note hidden" id="voiceNote"></p>
-
-    <button class="btn-flip" id="flipBtn">Show answer</button>
-
+  <div class="session__foot">
+    <button class="btn btn--accent btn--lg" id="flipBtn" type="button">Show answer</button>
     <div class="verdict hidden" id="verdict">
-      <button class="btn-missed" id="missedBtn">Missed it</button>
-      <button class="btn-got-it" id="gotItBtn">Got it</button>
+      <button class="btn btn--no btn--lg" id="missedBtn" type="button">Missed it</button>
+      <button class="btn btn--go btn--lg" id="gotItBtn" type="button">Got it</button>
     </div>
+  </div>
+</section>
 
-    <div class="spacer"></div>
-    <button class="btn-quiet" id="endBtn">End session</button>
-  </section>
+<!-- ============ SESSION SUMMARY ============ -->
+<section class="session hidden" id="doneScreen" aria-label="Session complete">
+  <div class="card">
+    <span class="card__tag">Session complete</span>
+    <p class="term" id="doneHeadline">Deck clear</p>
+    <p class="card__region" id="doneSummary" style="display:block"></p>
+  </div>
+  <div class="session__foot">
+    <button class="btn btn--accent btn--lg" id="doneBtn" type="button">Done</button>
+  </div>
+</section>
 
-  <section id="doneScreen" class="hidden">
-    <div class="card">
-      <p class="term">Deck clear</p>
-      <p class="side-note" id="doneSummary"></p>
-    </div>
-    <div class="spacer"></div>
-    <button class="btn-primary" id="backBtn">Back to start</button>
-  </section>
-
-</div>
+<nav class="tabbar" id="tabbar" role="tablist" aria-label="Sections"></nav>
 
 <script>
 /* =================================================================
@@ -933,22 +1506,61 @@ function load() {
 
 
 /* =================================================================
-   6. READING THE STATE
+   6. DEFAULTS, STREAK, AND READING THE STATE
    ================================================================= */
 
-function matchesFilter(term) {
-  return activeTrade === "All" || term.trade === activeTrade;
+const GAP_CHOICES = [1500, 3000, 5000];
+
+function ensureDefaults() {
+  if (!state.newTracker) state.newTracker = { date: "", count: 0 };
+  if (!state.streak) state.streak = { last: "", days: 0 };
+  if (!state.listen) {
+    state.listen = {
+      order: "es-first",     // comprehension before production
+      gap: 3000,             // the answering window
+      repeatSpanish: false,
+      deck: "progress",      // only cards you've actually started
+      trade: "All"
+    };
+  }
+  // A gap value from an older build might not be one of the three
+  // offered any more; snap it back rather than render a dead control.
+  if (GAP_CHOICES.indexOf(state.listen.gap) === -1) state.listen.gap = 3000;
+}
+
+function touchStreak() {
+  // Called when a card is graded, not when the app opens. Opening the
+  // app is not studying, and a streak you can extend by launching and
+  // closing is a streak that means nothing.
+  const today = todayKey();
+  if (state.streak.last === today) return;
+  state.streak.days = state.streak.last === addDays(today, -1)
+    ? state.streak.days + 1
+    : 1;
+  state.streak.last = today;
+}
+
+function currentStreak() {
+  // A streak whose last day is older than yesterday is already broken,
+  // so it reads as 0 without needing a midnight timer to reset it.
+  const s = state.streak;
+  if (!s.last) return 0;
+  const today = todayKey();
+  return (s.last === today || s.last === addDays(today, -1)) ? s.days : 0;
+}
+
+function matchesTrade(card, trade) {
+  return trade === "All" || card.trade === trade;
 }
 
 function getTermsDue() {
   const today = todayKey();
-  return deck.filter(function (term) {
-    return term.introduced && term.nextReview <= today && matchesFilter(term);
+  return deck.filter(function (card) {
+    return card.introduced && card.nextReview <= today && matchesTrade(card, studyTrade);
   });
 }
 
 function newCardsLeftToday() {
-  // Reset the counter when the date rolls over.
   if (state.newTracker.date !== todayKey()) {
     state.newTracker = { date: todayKey(), count: 0 };
   }
@@ -958,30 +1570,37 @@ function newCardsLeftToday() {
 function getNewTerms() {
   const room = newCardsLeftToday();
   if (room === 0) return [];
-  return deck.filter(function (term) {
-    return !term.introduced && matchesFilter(term);
+  return deck.filter(function (card) {
+    return !card.introduced && matchesTrade(card, studyTrade);
   }).slice(0, room);
 }
 
 function getBoxCounts() {
   const counts = [0, 0, 0, 0, 0];
-  deck.forEach(function (term) {
-    if (term.introduced) counts[term.box - 1]++;
+  deck.forEach(function (card) {
+    if (card.introduced) counts[card.box - 1]++;
   });
   return counts;
 }
 
 function getTrades() {
   const seen = [];
-  SEED_TERMS.forEach(function (term) {
-    if (seen.indexOf(term.trade) === -1) seen.push(term.trade);
+  SEED_TERMS.forEach(function (card) {
+    if (seen.indexOf(card.trade) === -1) seen.push(card.trade);
   });
   return seen;
 }
 
+function esc(text) {
+  // Card text is authored in SEED_TERMS, not typed by a user, so this is
+  // belt-and-braces. It costs one line and means an apostrophe or an
+  // angle bracket in a future term can never break the markup.
+  return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 
 /* =================================================================
-   7. PRONUNCIATION
+   7. SPEECH
 
    Every modern browser ships a speech engine at window.speechSynthesis.
    No library, no API key, no network call once the voice is on the
@@ -994,13 +1613,14 @@ function getTrades() {
 
 const TTS_SUPPORTED = "speechSynthesis" in window;
 
-// es-MX is Mexican Spanish. es-US is the US Latino voice, close
-// enough for jobsite purposes. es-419 is Latin American Spanish
-// generally. Peninsular (es-ES) is last: understandable everywhere,
-// but the c/z lisp isn't what a crew from Michoacán sounds like.
+// es-MX is Mexican Spanish. es-US is the US Latino voice, close enough
+// for jobsite purposes. es-419 is Latin American Spanish generally.
+// Peninsular (es-ES) is last: understandable everywhere, but the c/z
+// lisp isn't what a crew from Michoacan sounds like.
 const VOICE_PREFERENCE = ["es-MX", "es-US", "es-419", "es-CO", "es-AR", "es-ES"];
 
 let spanishVoice = null;
+let englishVoice = null;
 
 function normalizeLang(lang) {
   // Android reports "es_MX" with an underscore; everyone else uses
@@ -1008,59 +1628,94 @@ function normalizeLang(lang) {
   return (lang || "").replace("_", "-");
 }
 
-function pickSpanishVoice() {
+function pickVoices() {
   if (!TTS_SUPPORTED) return;
   const voices = window.speechSynthesis.getVoices();
   if (voices.length === 0) return;
 
+  spanishVoice = null;
   for (let i = 0; i < VOICE_PREFERENCE.length; i++) {
     const match = voices.filter(function (v) {
       return normalizeLang(v.lang) === VOICE_PREFERENCE[i];
     })[0];
-    if (match) { spanishVoice = match; return; }
+    if (match) { spanishVoice = match; break; }
+  }
+  if (!spanishVoice) {
+    spanishVoice = voices.filter(function (v) {
+      return normalizeLang(v.lang).indexOf("es") === 0;
+    })[0] || null;
   }
 
-  spanishVoice = voices.filter(function (v) {
-    return normalizeLang(v.lang).indexOf("es") === 0;
+  // Listen mode reads the English side too. Handing English text to a
+  // Spanish voice produces garbage - "shackle" comes out "shah-cly".
+  englishVoice = voices.filter(function (v) {
+    return normalizeLang(v.lang) === "en-US";
+  })[0] || voices.filter(function (v) {
+    return normalizeLang(v.lang).indexOf("en") === 0;
   })[0] || null;
+}
+
+function makeUtterance(text, lang) {
+  const u = new SpeechSynthesisUtterance(text);
+  const voice = lang === "en" ? englishVoice : spanishVoice;
+  if (voice) {
+    u.voice = voice;
+    u.lang = voice.lang;
+  } else {
+    u.lang = lang === "en" ? "en-US" : "es-MX";
+  }
+  // Under normal speed for Spanish. Native pace is fine once you know a
+  // word, but it blurs the vowels while you're still learning it.
+  u.rate = lang === "en" ? 0.95 : 0.85;
+  return u;
 }
 
 function speakSpanish(text, button) {
   if (!TTS_SUPPORTED) return;
-
-  // Stop anything mid-sentence. Without this, a second tap queues
-  // the word up behind the first rather than replaying it.
+  // Stop anything mid-sentence. Without this a second tap queues the
+  // word up behind the first rather than replaying it.
   window.speechSynthesis.cancel();
 
-  const utterance = new SpeechSynthesisUtterance(text);
-  if (spanishVoice) {
-    utterance.voice = spanishVoice;
-    utterance.lang = spanishVoice.lang;
-  } else {
-    utterance.lang = "es-MX";
+  const u = makeUtterance(text, "es");
+  if (button) {
+    u.onstart = function () { button.classList.add("is-speaking"); };
+    u.onend   = function () { button.classList.remove("is-speaking"); };
+    u.onerror = function () { button.classList.remove("is-speaking"); };
   }
-
-  // Under normal speed. Native pace is fine once you know a word,
-  // but it blurs the vowels while you're still learning it.
-  utterance.rate = 0.85;
-
-  utterance.onstart = function () { button.classList.add("speaking"); };
-  utterance.onend   = function () { button.classList.remove("speaking"); };
-  utterance.onerror = function () { button.classList.remove("speaking"); };
-
-  window.speechSynthesis.speak(utterance);
+  window.speechSynthesis.speak(u);
 }
 
-function describeVoice() {
-  if (!TTS_SUPPORTED) return "This browser has no speech engine, so audio is off.";
+function describeSpanishVoice() {
+  if (!TTS_SUPPORTED) return { ok: false, text: "This browser has no speech engine, so audio is off." };
   if (!spanishVoice) {
-    return "No Spanish voice installed. Android: Settings > Accessibility > " +
-           "Text-to-speech > install Spanish (Mexico).";
+    return { ok: false, text: "No Spanish voice installed. Android: Settings > Accessibility > " +
+                             "Text-to-speech > install Spanish (Mexico). iOS: Settings > " +
+                             "Accessibility > Spoken Content > Voices." };
   }
   const lang = normalizeLang(spanishVoice.lang);
-  if (lang === "es-MX" || lang === "es-US" || lang === "es-419") return "";
-  return "Using a " + lang + " voice. For Mexican Spanish, install Spanish (Mexico) " +
-         "in your device's text-to-speech settings.";
+  const good = (lang === "es-MX" || lang === "es-US" || lang === "es-419");
+  return {
+    ok: good,
+    text: good
+      ? "Spanish: " + spanishVoice.name + " (" + lang + ")."
+      : "Spanish: " + spanishVoice.name + " (" + lang + "). For Mexican Spanish, install " +
+        "Spanish (Mexico) in your device's text-to-speech settings."
+  };
+}
+
+function describeEnglishVoice() {
+  if (!TTS_SUPPORTED) return { ok: false, text: "" };
+  if (!englishVoice) {
+    return { ok: false, text: "No English voice found. Listen mode will read the English side " +
+                             "with the Spanish voice, which sounds wrong but is still usable." };
+  }
+  return { ok: true, text: "English: " + englishVoice.name + " (" + normalizeLang(englishVoice.lang) + ")." };
+}
+
+function setStatusLine(node, ok, text) {
+  node.classList.toggle("hidden", !text);
+  node.classList.toggle("status-line--on", !!ok);
+  node.lastElementChild.textContent = text;
 }
 
 
@@ -1072,139 +1727,196 @@ function describeVoice() {
 let queue = [];
 let current = null;
 let currentDirection = "en-es";
+let answerShown = false;      // guards grading a card you haven't seen
 let sessionRight = 0;
 let sessionWrong = 0;
+let sessionTotal = 0;
 let retried = [];
-let freshIds = [];   // ids introduced for the first time this session
-let activeTrade = "All";
+let freshIds = [];
+let studyTrade = "All";
+let activeTab = "study";
 
 
 /* =================================================================
-   9. SCREENS
+   9. ELEMENTS AND THE TAB SHELL
    ================================================================= */
 
+function $(id) { return document.getElementById(id); }
+
 const el = {
-  totalCount:  document.getElementById("totalCount"),
-  gauge:       document.getElementById("gauge"),
-  filter:      document.getElementById("filter"),
-  homeScreen:  document.getElementById("homeScreen"),
-  homeBody:    document.getElementById("homeBody"),
-  studyScreen: document.getElementById("studyScreen"),
-  doneScreen:  document.getElementById("doneScreen"),
-  progress:    document.getElementById("progress"),
-  studyCard:   document.getElementById("studyCard"),
-  newFlag:     document.getElementById("newFlag"),
-  prompt:      document.getElementById("prompt"),
-  promptNote:  document.getElementById("promptNote"),
-  answerBlock: document.getElementById("answerBlock"),
-  answer:      document.getElementById("answer"),
-  regional:    document.getElementById("regional"),
-  promptSpeak: document.getElementById("promptSpeak"),
-  answerSpeak: document.getElementById("answerSpeak"),
-  voiceNote:   document.getElementById("voiceNote"),
-  flipBtn:     document.getElementById("flipBtn"),
-  verdict:     document.getElementById("verdict"),
-  doneSummary: document.getElementById("doneSummary"),
-  gotItBtn:    document.getElementById("gotItBtn"),
-  missedBtn:   document.getElementById("missedBtn"),
-  endBtn:      document.getElementById("endBtn"),
-  backBtn:     document.getElementById("backBtn")
+  body: document.body,
+  deckCount: $("deckCount"),
+  tabbar: $("tabbar"),
+  todayBlock: $("todayBlock"),
+  tradeChips: $("tradeChips"),
+  listenChips: $("listenChips"),
+  searchInput: $("searchInput"),
+  searchCount: $("searchCount"),
+  browseRows: $("browseRows"),
+  streakN: $("streakN"),
+  streakLabel: $("streakLabel"),
+  gauge: $("gauge"),
+  gaugeNote: $("gaugeNote"),
+  tradeMeters: $("tradeMeters"),
+  voiceDiag: $("voiceDiag"),
+  voiceDiagEn: $("voiceDiagEn"),
+  exportBtn: $("exportBtn"),
+  exportBox: $("exportBox"),
+  resetBtn: $("resetBtn"),
+
+  sessionScreen: $("sessionScreen"),
+  doneScreen: $("doneScreen"),
+  sessionProgress: $("sessionProgress"),
+  sessionFill: $("sessionFill"),
+  quitBtn: $("quitBtn"),
+  studyCard: $("studyCard"),
+  newFlag: $("newFlag"),
+  cardTrade: $("cardTrade"),
+  promptText: $("promptText"),
+  promptSpeak: $("promptSpeak"),
+  answerBlock: $("answerBlock"),
+  answerText: $("answerText"),
+  answerSpeak: $("answerSpeak"),
+  regionText: $("regionText"),
+  flipBtn: $("flipBtn"),
+  verdict: $("verdict"),
+  gotItBtn: $("gotItBtn"),
+  missedBtn: $("missedBtn"),
+  doneHeadline: $("doneHeadline"),
+  doneSummary: $("doneSummary"),
+  doneBtn: $("doneBtn"),
+
+  nowPlaying: $("nowPlaying"),
+  listenPlay: $("listenPlay"),
+  listenIcon: $("listenIcon"),
+  listenPrev: $("listenPrev"),
+  listenNext: $("listenNext"),
+  wakeStatus: $("wakeStatus"),
+  listenVoiceStatus: $("listenVoiceStatus"),
+  optOrder: $("optOrder"),
+  optGap: $("optGap"),
+  optRepeat: $("optRepeat"),
+  optDeck: $("optDeck")
 };
 
-function showScreen(name) {
-  el.homeScreen.classList.toggle("hidden", name !== "home");
-  el.studyScreen.classList.toggle("hidden", name !== "study");
-  el.doneScreen.classList.toggle("hidden", name !== "done");
+const TABS = [
+  { id: "study",  label: "Study",
+    icon: '<rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M7 3.5h10"/>' },
+  { id: "listen", label: "Listen",
+    icon: '<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="2.5" y="13.5" width="4" height="6.5" rx="2"/><rect x="17.5" y="13.5" width="4" height="6.5" rx="2"/>' },
+  { id: "browse", label: "Browse",
+    icon: '<path d="M4 6.5h16M4 12h16M4 17.5h10"/>' },
+  { id: "stats",  label: "Stats",
+    icon: '<path d="M5 19V12M12 19V5M19 19v-9"/>' }
+];
+
+function renderTabbar() {
+  el.tabbar.innerHTML = TABS.map(function (tab) {
+    return '<button class="tabbar__btn" type="button" role="tab" data-tab="' + tab.id + '" ' +
+             'aria-selected="' + (tab.id === activeTab) + '">' +
+             '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+                  'stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+               tab.icon +
+             '</svg>' + tab.label +
+           '</button>';
+  }).join("");
 }
 
-function renderVoiceNote() {
-  const message = describeVoice();
-  el.voiceNote.textContent = message;
-  el.voiceNote.classList.toggle("hidden", message === "");
+function showTab(name) {
+  activeTab = name;
+  TABS.forEach(function (tab) {
+    $("panel-" + tab.id).classList.toggle("hidden", tab.id !== name);
+  });
+  renderTabbar();
+  window.scrollTo(0, 0);
+  // Leaving Listen stops playback. A loop still talking from a tab you
+  // can't see is a loop you can't turn off.
+  if (name !== "listen") listenStop();
+  if (name === "browse") renderBrowse();
+  if (name === "stats")  renderStats();
+  if (name === "listen") renderListen();
+  if (name === "study")  renderStudy();
 }
 
-function renderGauge() {
+
+/* =================================================================
+   10. STUDY TAB
+   ================================================================= */
+
+function renderRamp() {
+  // The same ramp as the Stats chart, one slim row. Returns "" when
+  // nothing has been introduced: an empty chart on day one reads as
+  // broken rather than as new, so it isn't drawn at all.
   const counts = getBoxCounts();
-  const highest = Math.max.apply(null, counts);
-  el.gauge.innerHTML = "";
-
-  counts.forEach(function (count) {
-    // Scale bars against the fullest box so the shape stays readable
-    // whether you've introduced 12 terms or 250.
-    const heightPercent = highest === 0 ? 0 : (count / highest) * 100;
-    const col = document.createElement("div");
-    col.className = "gauge-col";
-    col.innerHTML =
-      '<div class="gauge-bar" style="height:' + heightPercent + '%"></div>' +
-      '<div class="gauge-n">' + count + "</div>";
-    el.gauge.appendChild(col);
-  });
+  const total = counts.reduce(function (a, b) { return a + b; }, 0);
+  if (total === 0) return "";
+  return '<div class="ramp" style="margin-top: var(--sp-5)" aria-hidden="true">' +
+    counts.map(function (n, i) {
+      if (n === 0) return "";
+      return '<span class="ramp__seg" style="flex:' + n +
+             ';background:var(--box-' + (i + 1) + ')"></span>';
+    }).join("") +
+    '</div>' +
+    '<p class="tiny faint" style="margin: var(--sp-2) 0 0">' + total +
+      ' cards in play, box 1 on the left</p>';
 }
 
-function renderFilter() {
-  const trades = ["All"].concat(getTrades());
-  el.filter.innerHTML = "";
+function renderStudy() {
+  el.deckCount.textContent = deck.length + " CARDS";
 
-  trades.forEach(function (trade) {
-    const previous = activeTrade;
-    activeTrade = trade;
-    const waiting = getTermsDue().length + getNewTerms().length;
-    activeTrade = previous;
-
-    const chip = document.createElement("button");
-    chip.className = "chip" + (trade === activeTrade ? " active" : "");
-    chip.type = "button";
-    chip.innerHTML = trade + (waiting > 0 ? ' <span class="n">' + waiting + "</span>" : "");
-    chip.addEventListener("click", function () {
-      activeTrade = trade;
-      renderHome();
-    });
-    el.filter.appendChild(chip);
-  });
-}
-
-function renderHome() {
   const due = getTermsDue();
   const fresh = getNewTerms();
-  const introduced = deck.filter(function (t) { return t.introduced; }).length;
-
-  el.totalCount.textContent = introduced + " of " + deck.length + " started";
-  renderGauge();
-  renderFilter();
-
   const waiting = due.length + fresh.length;
 
   if (waiting === 0) {
-    const anyLeft = deck.some(function (t) { return !t.introduced; });
-    el.homeBody.innerHTML =
-      '<div class="empty">' +
-        '<p class="term long">Nothing due</p>' +
-        "<p>" + (anyLeft
-          ? "You've hit today's limit of " + NEW_PER_DAY + " new cards. More tomorrow."
-          : "Every card is scheduled. Boxes 4 and 5 take longer to come back.") +
-        "</p>" +
-      "</div>";
+    const anyLeft = deck.some(function (c) { return !c.introduced && matchesTrade(c, studyTrade); });
+    el.todayBlock.innerHTML =
+      '<div class="empty-state">' +
+        '<p class="empty-state__title">Nothing due</p>' +
+        '<p class="empty-state__body">' + (anyLeft
+          ? "That's today's " + NEW_PER_DAY + " new cards spoken for. More tomorrow."
+          : "Every card is scheduled. Boxes 4 and 5 take a week or more to come back.") +
+        '</p>' +
+      '</div>' + renderRamp();
   } else {
-    const parts = [];
-    if (due.length) parts.push(due.length + " to review");
-    if (fresh.length) parts.push(fresh.length + " new");
-
-    el.homeBody.innerHTML =
-      '<div class="stack">' +
-        '<p style="margin:0 0 0.25rem; color:var(--muted); font-size:0.8125rem">' +
-          parts.join(", ") +
-        "</p>" +
-        '<button class="btn-primary" id="startBtn">Start reviewing</button>' +
-      "</div>";
-    document.getElementById("startBtn").addEventListener("click", startSession);
+    el.todayBlock.innerHTML =
+      '<div class="today">' +
+        '<div><span class="today__n today__n--due tnum">' + due.length + '</span>' +
+          '<span class="today__lab">to review</span></div>' +
+        '<div><span class="today__n tnum">' + fresh.length + '</span>' +
+          '<span class="today__lab">new</span></div>' +
+      '</div>' +
+      renderRamp() +
+      '<button class="btn btn--accent btn--lg" id="startBtn" type="button" ' +
+        'style="margin-top: var(--sp-5)">Start reviewing</button>';
+    $("startBtn").addEventListener("click", startSession);
   }
 
-  showScreen("home");
+  renderTradeChips();
+}
+
+function renderTradeChips() {
+  const trades = ["All"].concat(getTrades());
+  el.tradeChips.innerHTML = trades.map(function (trade) {
+    // Due only. Adding the new-card allowance here put the same "12" on
+    // every chip on day one - each trade really would serve all twelve on
+    // its own - which reads as a broken tally rather than as a choice.
+    // The allowance is stated once, in the Today block above.
+    const previous = studyTrade;
+    studyTrade = trade;
+    const waiting = getTermsDue().length;
+    studyTrade = previous;
+
+    return '<button class="chip" type="button" data-trade="' + esc(trade) + '" ' +
+             'aria-pressed="' + (trade === studyTrade) + '">' + esc(trade) +
+             (waiting > 0 ? ' <span class="chip__n">' + waiting + '</span>' : '') +
+           '</button>';
+  }).join("");
 }
 
 
 /* =================================================================
-   10. RUNNING A SESSION
+   11. RUNNING A SESSION
    ================================================================= */
 
 function shuffle(array) {
@@ -1220,18 +1932,24 @@ function shuffle(array) {
   return array;
 }
 
+function buzz(ms) {
+  // Feature-detected and silent when absent. iOS Safari has no vibrate
+  // at all, so this must never be load-bearing.
+  if (navigator.vibrate) { try { navigator.vibrate(ms); } catch (err) { /* ignore */ } }
+}
+
 function startSession() {
   const due = shuffle(getTermsDue().slice());
   const fresh = getNewTerms();
 
   // Mark the new ones as introduced up front and count them against
-  // today's allowance, so backing out mid-session doesn't hand you
-  // the same twelve cards again.
-  fresh.forEach(function (term) {
-    term.introduced = true;
-    term.nextReview = todayKey();
+  // today's allowance, so backing out mid-session doesn't hand you the
+  // same twelve cards again.
+  fresh.forEach(function (card) {
+    card.introduced = true;
+    card.nextReview = todayKey();
   });
-  freshIds = fresh.map(function (term) { return term.id; });
+  freshIds = fresh.map(function (card) { return card.id; });
   state.newTracker.count += fresh.length;
   save();
 
@@ -1241,8 +1959,12 @@ function startSession() {
 
   sessionRight = 0;
   sessionWrong = 0;
+  sessionTotal = queue.length;
   retried = [];
-  showScreen("study");
+
+  el.body.classList.add("in-session");
+  el.sessionScreen.classList.remove("hidden");
+  el.doneScreen.classList.add("hidden");
   nextCard();
 }
 
@@ -1250,6 +1972,7 @@ function nextCard() {
   if (queue.length === 0) { finishSession(); return; }
 
   current = queue.shift();
+  answerShown = false;
 
   // Randomize the direction. Recognizing a word and producing it are
   // different skills, and only one of them helps when you're the one
@@ -1259,25 +1982,29 @@ function nextCard() {
   const promptText = currentDirection === "en-es" ? current.en : current.es;
   const answerText = currentDirection === "en-es" ? current.es : current.en;
 
-  el.prompt.textContent = promptText;
-  el.answer.textContent = answerText;
-  el.promptNote.textContent = current.trade;
+  el.promptText.textContent = promptText;
+  el.answerText.textContent = answerText;
 
-  // Full phrases need smaller type than single words or they wrap
-  // into four lines on a phone.
-  el.prompt.className = "term" + (promptText.length > 18 ? " long" : "");
-  el.answer.className = "term" + (answerText.length > 18 ? " long" : "");
-  el.studyCard.classList.toggle("is-phrase", current.trade === "Phrases");
+  // The trade label is what tells la escalera the ladder apart from la
+  // escalera the stairs, el nivel the tool from el nivel the elevation.
+  // Those homonyms are deliberate; this label is what disambiguates
+  // them, so it stays on the card.
+  el.cardTrade.textContent = current.trade;
+
+  // Full phrases need smaller type than single words or they wrap into
+  // four lines on a phone.
+  el.promptText.className = "term" + (promptText.length > 18 ? " term--long" : "");
+  el.answerText.className = "term" + (answerText.length > 18 ? " term--long" : "");
 
   if (current.region) {
-    el.regional.textContent = current.region;
-    el.regional.classList.remove("hidden");
+    el.regionText.textContent = current.region;
+    el.regionText.classList.remove("hidden");
   } else {
-    el.regional.classList.add("hidden");
+    el.regionText.classList.add("hidden");
   }
 
-  // Flag only the cards being seen for the very first time, so you
-  // know to read the answer rather than strain to recall it.
+  // Flag only the cards being seen for the very first time, so you know
+  // to read the answer rather than strain to recall it.
   el.newFlag.classList.toggle("hidden", freshIds.indexOf(current.id) === -1);
 
   el.answerBlock.classList.add("hidden");
@@ -1287,40 +2014,53 @@ function nextCard() {
   // The speak button follows the Spanish, whichever side it's on.
   el.promptSpeak.classList.toggle("hidden", currentDirection !== "es-en" || !TTS_SUPPORTED);
   el.answerSpeak.classList.add("hidden");
-  renderVoiceNote();
 
   const done = sessionRight + sessionWrong;
-  el.progress.textContent = "Card " + (done + 1) + " of " + (done + 1 + queue.length);
+  const remaining = queue.length + 1;
+  el.sessionProgress.textContent = (done + 1) + " / " + (done + remaining);
+  el.sessionFill.style.width = (done / (done + remaining) * 100) + "%";
+  el.studyCard.scrollTop = 0;
 }
 
 function flip() {
+  if (answerShown) return;
+  answerShown = true;
   el.answerBlock.classList.remove("hidden");
   el.flipBtn.classList.add("hidden");
   el.verdict.classList.remove("hidden");
+  buzz(8);
 
-  if (currentDirection === "en-es" && TTS_SUPPORTED) {
-    el.answerSpeak.classList.remove("hidden");
-    // Play once automatically. You've just committed to an answer,
-    // which is the moment the correct sound actually sticks.
-    speakSpanish(current.es, el.answerSpeak);
+  if (TTS_SUPPORTED) {
+    el.answerSpeak.classList.toggle("hidden", currentDirection !== "en-es");
+    if (currentDirection === "en-es") {
+      // Play once automatically. You've just committed to an answer,
+      // which is the moment the correct sound actually sticks.
+      speakSpanish(current.es, el.answerSpeak);
+    }
   }
 }
 
 function markCorrect() {
+  // A stray tap on a card you haven't turned over would otherwise bank
+  // a word you never saw and push it a week out.
+  if (!answerShown || !current) return;
   if (current.box < MAX_BOX) current.box++;
   current.nextReview = calculateNextReview(current.box);
   sessionRight++;
+  buzz(12);
   finishCard();
 }
 
 function markWrong() {
+  if (!answerShown || !current) return;
   current.box = 1;
   current.nextReview = calculateNextReview(1);
   sessionWrong++;
+  buzz([10, 40, 10]);
 
   // Put a missed card back at the end of this session, but only once.
   // The second look is where it sticks; unlimited retries would trap
-  // you on a single word.
+  // you on a single word for the rest of the session.
   if (retried.indexOf(current.id) === -1) {
     retried.push(current.id);
     queue.push(current);
@@ -1329,48 +2069,634 @@ function markWrong() {
 }
 
 function finishCard() {
+  touchStreak();
   save();
-  renderGauge();
+  answerShown = false;
   nextCard();
 }
 
 function finishSession() {
   const total = sessionRight + sessionWrong;
+  el.sessionScreen.classList.add("hidden");
+  el.doneScreen.classList.remove("hidden");
+  el.doneHeadline.textContent = total === 0 ? "Nothing to review" : "Deck clear";
   el.doneSummary.textContent = total === 0
-    ? "No cards reviewed."
+    ? "No cards were due. Come back tomorrow, or switch the trade filter."
     : sessionRight + " right, " + sessionWrong + " missed, out of " + total + ".";
-  renderGauge();
-  showScreen("done");
+}
+
+function endSession() {
+  el.body.classList.remove("in-session");
+  el.sessionScreen.classList.add("hidden");
+  el.doneScreen.classList.add("hidden");
+  current = null;
+  answerShown = false;
+  queue = [];
+  showTab("study");
 }
 
 
 /* =================================================================
-   11. WIRING IT UP
+   12. BROWSE TAB
+
+   The "what's the word for shackle" lookup you do standing on site.
+   Search matches English, Spanish AND the region field, because half
+   the time what you half-remember is the Mexican word in the note.
    ================================================================= */
+
+function renderBrowse() {
+  const q = el.searchInput.value.trim().toLowerCase();
+  const matches = deck.filter(function (card) {
+    if (!q) return true;
+    return (card.en + " " + card.es + " " + card.region + " " + card.trade)
+      .toLowerCase().indexOf(q) !== -1;
+  });
+
+  el.searchCount.textContent = q
+    ? matches.length + " of " + deck.length + " cards"
+    : deck.length + " cards";
+
+  el.browseRows.innerHTML = matches.map(function (card) {
+    const boxStyle = card.introduced ? 'background:var(--box-' + card.box + ')' : '';
+    const meta = [esc(card.trade)];
+    if (card.region) meta.push(esc(card.region));
+    meta.push(card.introduced ? 'Box ' + card.box : 'Not started');
+    return '<li class="row">' +
+      '<span class="row__box" style="' + boxStyle + '" aria-hidden="true"></span>' +
+      '<span class="row__main">' +
+        '<span class="row__en">' + esc(card.en) + '</span>' +
+        '<span class="row__es">' + esc(card.es) + '</span>' +
+        '<span class="row__meta">' + meta.join(' &middot; ') + '</span>' +
+      '</span>' +
+      '<button class="row__speak" type="button" data-es="' + esc(card.es) + '" aria-label="Hear it">' +
+        '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+             'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>' +
+        '</svg></button>' +
+    '</li>';
+  }).join("");
+}
+
+
+/* =================================================================
+   13. STATS TAB
+   ================================================================= */
+
+function renderGauge() {
+  const counts = getBoxCounts();
+  const highest = Math.max.apply(null, counts);
+  el.gauge.innerHTML = counts.map(function (count, i) {
+    let bar;
+    if (count === 0) {
+      // No colour for an empty box. A 3px orange line at the baseline
+      // reads as a small value when the true answer is "nothing".
+      bar = '<span class="gauge__bar gauge__bar--empty"></span>';
+    } else {
+      // 6% floor so a box holding one card is still visible, applied
+      // only to boxes that actually hold something.
+      const pct = Math.max(6, (count / highest) * 100);
+      bar = '<span class="gauge__bar" style="height:' + pct +
+            '%;background:var(--box-' + (i + 1) + ')"></span>';
+    }
+    // Numbers in muted text, never the bar's colour: the mark carries
+    // identity, the text states a value.
+    return '<div class="gauge__col">' +
+             '<div class="gauge__plot">' + bar + '</div>' +
+             '<div class="gauge__n tnum">' + count + '</div>' +
+             '<div class="gauge__k">box ' + (i + 1) + '</div>' +
+           '</div>';
+  }).join("");
+
+  const introduced = counts.reduce(function (a, b) { return a + b; }, 0);
+  el.gaugeNote.textContent = introduced === 0
+    ? "Nothing started yet. Boxes fill from the left."
+    : introduced + " of " + deck.length + " cards started. Weight shifting right, " +
+      "over weeks, is the only progress signal here that matters.";
+}
+
+function renderTradeMeters() {
+  const trades = getTrades();
+  el.tradeMeters.innerHTML = trades.map(function (trade) {
+    const cards = deck.filter(function (c) { return c.trade === trade; });
+    // "Mastered" is box 4 or 5 - the two intervals longer than a week.
+    // Anything below that you are still actively relearning.
+    const solid = cards.filter(function (c) { return c.introduced && c.box >= 4; }).length;
+    const pct = (solid / cards.length) * 100;
+    return '<div class="trade-meter">' +
+      '<div class="meter__head"><span>' + esc(trade) + '</span>' +
+        '<span class="meter__n">' + solid + ' / ' + cards.length + '</span></div>' +
+      '<div class="meter__track"><div class="meter__fill" style="width:' + pct + '%"></div></div>' +
+    '</div>';
+  }).join("");
+}
+
+function renderStats() {
+  const streak = currentStreak();
+  el.streakN.textContent = streak;
+  el.streakLabel.textContent = streak === 0
+    ? "no streak - review a card to start one"
+    : "day streak";
+  renderGauge();
+  renderTradeMeters();
+
+  const es = describeSpanishVoice();
+  const en = describeEnglishVoice();
+  setStatusLine(el.voiceDiag, es.ok, es.text);
+  setStatusLine(el.voiceDiagEn, en.ok, en.text);
+}
+
+
+/* =================================================================
+   14. LISTEN MODE
+
+   The design constraint is that the user is driving. They cannot look
+   at the phone and cannot touch it. Everything below follows from that:
+   it auto-advances forever, the controls are oversized, and it never
+   asks a question.
+
+   Three browser realities this has to survive, none of them obvious:
+
+   1. iOS will not speak at all until speak() has been called from
+      inside a real user gesture. The play tap is spent on a silent
+      utterance so the first real one comes out clean.
+
+   2. Chrome cuts speech off after roughly 15 seconds of continuous
+      output. A pause()/resume() pair on an interval resets that timer.
+
+   3. onend is not guaranteed to fire. It gets skipped when the engine
+      is interrupted, and on some Android builds it never fires at all.
+      This is a chain where every link waits on the previous one, so one
+      missed callback stalls the whole loop with no error and no way for
+      the user to tell why. Every speech call something is waiting on
+      gets a watchdog timeout, plus a guard so the callback can't fire
+      twice when both the real onend and the watchdog land.
+   ================================================================= */
+
+const SHORT_WAIT = 700;   // breathing room after the answer, not a quiz
+const REPEAT_WAIT = 450;  // between the two Spanish readings
+
+const listen = {
+  playing: false,
+  primed: false,
+  cards: [],
+  index: 0,
+  plan: [],
+  // Bumped on every stop, skip and card change. Any callback carrying an
+  // old token is from an utterance we've already walked away from, and
+  // is dropped instead of advancing the chain twice.
+  token: 0,
+  timers: [],
+  keepAlive: null,
+  wakeLock: null
+};
+
+function listenClearTimers() {
+  listen.timers.forEach(clearTimeout);
+  listen.timers = [];
+}
+
+function listenAfter(ms, fn) {
+  const token = listen.token;
+  const t = setTimeout(function () {
+    if (!listen.playing || token !== listen.token) return;
+    fn();
+  }, ms);
+  listen.timers.push(t);
+  return t;
+}
+
+function listenSpeak(text, lang, onDone) {
+  let settled = false;
+  let watchdog = null;
+
+  function settle() {
+    if (settled) return;   // both onend and the watchdog will try
+    settled = true;
+    clearTimeout(watchdog);
+    onDone();
+  }
+
+  if (!TTS_SUPPORTED) {
+    watchdog = setTimeout(settle, 400);
+    listen.timers.push(watchdog);
+    return;
+  }
+
+  const u = makeUtterance(text, lang);
+  u.onend = settle;
+  u.onerror = settle;
+
+  // Generous by design: about eight characters a second plus a second
+  // and a half of slack. A normal utterance always finishes on onend,
+  // so the watchdog only ever fires when the engine has gone silent.
+  watchdog = setTimeout(settle, 1500 + text.length * 120);
+  listen.timers.push(watchdog);
+
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+
+function listenBuildPlan(card) {
+  const esSide = { text: card.es, lang: "es" };
+  const enSide = { text: card.en, lang: "en" };
+  const spanishFirst = state.listen.order === "es-first";
+
+  // The gap belongs after the FIRST side only - that is the answering
+  // window. What follows the second side is breathing room, and a long
+  // pause there just feels like the app has died.
+  const plan = [
+    spanishFirst ? esSide : enSide,
+    { wait: state.listen.gap },
+    spanishFirst ? enSide : esSide
+  ];
+  if (state.listen.repeatSpanish) plan.push({ wait: REPEAT_WAIT }, esSide);
+  plan.push({ wait: SHORT_WAIT });
+  return plan;
+}
+
+function listenRunStep(i) {
+  if (!listen.playing) return;
+  if (i >= listen.plan.length) { listenAdvance(1); return; }
+
+  const step = listen.plan[i];
+  const token = listen.token;
+
+  if (step.wait) {
+    listenAfter(step.wait, function () { listenRunStep(i + 1); });
+    return;
+  }
+  listenSpeak(step.text, step.lang, function () {
+    if (!listen.playing || token !== listen.token) return;
+    listenRunStep(i + 1);
+  });
+}
+
+function listenPlayCurrent() {
+  const card = listen.cards[listen.index];
+  if (!card) { listenStop(); return; }
+  listen.token++;              // orphan anything still in flight
+  listenClearTimers();
+  listen.plan = listenBuildPlan(card);
+  listenRenderNowPlaying(card);
+  listenRunStep(0);
+}
+
+function listenAdvance(step) {
+  if (listen.cards.length === 0) { listenStop(); return; }
+  // Wraps forever. It plays until the user stops it or the phone does.
+  listen.index = (listen.index + step + listen.cards.length) % listen.cards.length;
+  listenPlayCurrent();
+}
+
+function listenBuildDeck() {
+  return deck.filter(function (card) {
+    if (!matchesTrade(card, state.listen.trade)) return false;
+    if (state.listen.deck === "progress") return card.introduced;
+    return true;
+  });
+}
+
+function listenPrime() {
+  // iOS will not speak until speak() has been called from inside a real
+  // user gesture. This is that call: a zero-volume space, spent on the
+  // play tap, so the first word out is not swallowed.
+  if (!TTS_SUPPORTED || listen.primed) return;
+  try {
+    const u = new SpeechSynthesisUtterance(" ");
+    u.volume = 0;
+    window.speechSynthesis.speak(u);
+    listen.primed = true;
+  } catch (err) { /* nothing to do; the real utterance will still try */ }
+}
+
+function listenKeepAliveStart() {
+  listenKeepAliveStop();
+  // Chrome stops speaking after roughly 15 seconds of continuous output.
+  // A pause()/resume() pair resets that internal timer. Guarded twice:
+  // only while playing, and only while something is actually being
+  // spoken, because resume() on an idle engine can un-pause speech the
+  // user deliberately paused.
+  listen.keepAlive = setInterval(function () {
+    if (!listen.playing || !TTS_SUPPORTED) return;
+    if (!window.speechSynthesis.speaking) return;
+    window.speechSynthesis.pause();
+    window.speechSynthesis.resume();
+  }, 9000);
+}
+
+function listenKeepAliveStop() {
+  if (listen.keepAlive) { clearInterval(listen.keepAlive); listen.keepAlive = null; }
+}
+
+function listenWakeLockRequest() {
+  if (!("wakeLock" in navigator)) {
+    setStatusLine(el.wakeStatus, false,
+      "This browser can't hold the screen awake. Set your phone's auto-lock to " +
+      "5 minutes or Never before you drive, or the screen sleeping will stop playback.");
+    return;
+  }
+  navigator.wakeLock.request("screen").then(function (lock) {
+    listen.wakeLock = lock;
+    lock.addEventListener("release", function () { listen.wakeLock = null; });
+    setStatusLine(el.wakeStatus, true, "Screen held awake while playing.");
+  }).catch(function (err) {
+    // Refused rather than absent - usually a background tab or a
+    // battery-saver mode. Say so instead of failing silently.
+    setStatusLine(el.wakeStatus, false,
+      "Screen lock refused (" + err.name + "). Lengthen your phone's auto-lock instead.");
+  });
+}
+
+function listenWakeLockRelease() {
+  if (!listen.wakeLock) return;
+  try { listen.wakeLock.release(); } catch (err) { /* already gone */ }
+  listen.wakeLock = null;
+}
+
+function listenStart() {
+  listen.cards = listenBuildDeck();
+  if (listen.cards.length === 0) {
+    setStatusLine(el.wakeStatus, false,
+      "Nothing to play: no cards match that trade and deck. Try Everything, or All trades.");
+    return;
+  }
+  if (listen.index >= listen.cards.length) listen.index = 0;
+
+  listenPrime();
+  listen.playing = true;
+  listenRenderTransport();
+  listenKeepAliveStart();
+  listenWakeLockRequest();
+  listenPlayCurrent();
+}
+
+function listenStop() {
+  if (!listen.playing && listen.timers.length === 0) { listenRenderTransport(); return; }
+  listen.playing = false;
+  listen.token++;
+  listenClearTimers();
+  listenKeepAliveStop();
+  listenWakeLockRelease();
+  if (TTS_SUPPORTED) window.speechSynthesis.cancel();
+  listenRenderTransport();
+}
+
+function listenToggle() {
+  if (listen.playing) { listenStop(); } else { listenStart(); }
+}
+
+function listenSkip(step) {
+  listen.cards = listenBuildDeck();
+  if (listen.cards.length === 0) return;
+  listen.token++;
+  listenClearTimers();
+  if (TTS_SUPPORTED) window.speechSynthesis.cancel();
+  listen.index = (listen.index + step + listen.cards.length) % listen.cards.length;
+  if (listen.playing) {
+    listenPlayCurrent();
+  } else {
+    listenRenderNowPlaying(listen.cards[listen.index]);
+  }
+}
+
+const PLAY_ICON  = '<path d="M8 5.5v13l11-6.5z"/>';
+const PAUSE_ICON = '<rect x="7" y="5.5" width="3.6" height="13" rx="1.2"/>' +
+                   '<rect x="13.4" y="5.5" width="3.6" height="13" rx="1.2"/>';
+
+function listenRenderTransport() {
+  el.listenIcon.innerHTML = listen.playing ? PAUSE_ICON : PLAY_ICON;
+  el.listenPlay.setAttribute("aria-label", listen.playing ? "Pause" : "Play");
+  if (!listen.playing) {
+    setStatusLine(el.wakeStatus, false, listen.primed
+      ? "Paused. Screen lock released."
+      : "Press play. The screen is held awake only while it's playing.");
+  }
+}
+
+function listenRenderNowPlaying(card) {
+  if (!card) return;
+  const spanishFirst = state.listen.order === "es-first";
+  el.nowPlaying.innerHTML =
+    '<div class="now-playing__side">' + esc(spanishFirst ? card.es : card.en) + '</div>' +
+    '<div class="now-playing__other">' + esc(spanishFirst ? card.en : card.es) +
+      ' &middot; ' + esc(card.trade) + '</div>';
+}
+
+function segment(container, options, value, onPick) {
+  container.innerHTML = options.map(function (opt) {
+    return '<button class="seg__btn" type="button" data-value="' + opt.value + '" ' +
+             'aria-pressed="' + (String(opt.value) === String(value)) + '">' + opt.label +
+           '</button>';
+  }).join("");
+  container.onclick = function (event) {
+    const btn = event.target.closest(".seg__btn");
+    if (!btn) return;
+    onPick(btn.dataset.value);
+  };
+}
+
+function renderListen() {
+  segment(el.optOrder, [
+    { value: "es-first", label: "Spanish" },
+    { value: "en-first", label: "English" }
+  ], state.listen.order, function (v) { state.listen.order = v; savePrefsAndRestart(); });
+
+  segment(el.optGap, [
+    { value: 1500, label: "1.5s" },
+    { value: 3000, label: "3s" },
+    { value: 5000, label: "5s" }
+  ], state.listen.gap, function (v) { state.listen.gap = Number(v); savePrefsAndRestart(); });
+
+  segment(el.optRepeat, [
+    { value: "off", label: "Off" },
+    { value: "on", label: "On" }
+  ], state.listen.repeatSpanish ? "on" : "off", function (v) {
+    state.listen.repeatSpanish = (v === "on"); savePrefsAndRestart();
+  });
+
+  segment(el.optDeck, [
+    { value: "progress", label: "In progress" },
+    { value: "all", label: "Everything" }
+  ], state.listen.deck, function (v) { state.listen.deck = v; listen.index = 0; savePrefsAndRestart(); });
+
+  const trades = ["All"].concat(getTrades());
+  el.listenChips.innerHTML = trades.map(function (trade) {
+    return '<button class="chip" type="button" data-listen-trade="' + esc(trade) + '" ' +
+             'aria-pressed="' + (trade === state.listen.trade) + '">' + esc(trade) + '</button>';
+  }).join("");
+
+  const en = describeEnglishVoice();
+  const es = describeSpanishVoice();
+  setStatusLine(el.listenVoiceStatus, es.ok && en.ok,
+    es.text + (en.text ? " " + en.text : ""));
+  listenRenderTransport();
+  if (!listen.playing && listen.cards.length === 0) {
+    const preview = listenBuildDeck();
+    if (preview.length) listenRenderNowPlaying(preview[0]);
+  }
+}
+
+function savePrefsAndRestart() {
+  save();
+  const wasPlaying = listen.playing;
+  listenStop();
+  renderListen();
+  // A setting change mid-drive should take effect on the next card, not
+  // require the driver to find the play button again.
+  if (wasPlaying) listenStart();
+}
+
+
+/* =================================================================
+   15. WIRING IT UP
+   ================================================================= */
+
+function renderAll() {
+  renderStudy();
+  if (activeTab === "browse") renderBrowse();
+  if (activeTab === "stats") renderStats();
+}
+
+el.tabbar.addEventListener("click", function (event) {
+  const btn = event.target.closest(".tabbar__btn");
+  if (btn) showTab(btn.dataset.tab);
+});
+
+el.tradeChips.addEventListener("click", function (event) {
+  const chip = event.target.closest(".chip");
+  if (!chip) return;
+  studyTrade = chip.dataset.trade;
+  renderStudy();
+});
+
+el.listenChips.addEventListener("click", function (event) {
+  const chip = event.target.closest(".chip");
+  if (!chip) return;
+  state.listen.trade = chip.dataset.listenTrade;
+  listen.index = 0;
+  savePrefsAndRestart();
+});
+
+el.searchInput.addEventListener("input", renderBrowse);
+el.browseRows.addEventListener("click", function (event) {
+  const btn = event.target.closest(".row__speak");
+  if (btn) speakSpanish(btn.dataset.es, btn);
+});
 
 el.promptSpeak.addEventListener("click", function () { speakSpanish(current.es, el.promptSpeak); });
 el.answerSpeak.addEventListener("click", function () { speakSpanish(current.es, el.answerSpeak); });
 el.flipBtn.addEventListener("click", flip);
 el.gotItBtn.addEventListener("click", markCorrect);
 el.missedBtn.addEventListener("click", markWrong);
-el.endBtn.addEventListener("click", renderHome);
-el.backBtn.addEventListener("click", renderHome);
+el.quitBtn.addEventListener("click", endSession);
+el.doneBtn.addEventListener("click", endSession);
 
-// Voices load asynchronously in Chrome, so the first getVoices()
-// call usually comes back empty. The browser fires voiceschanged
-// when the list is ready, which is when we get to pick properly.
+el.listenPlay.addEventListener("click", listenToggle);
+el.listenNext.addEventListener("click", function () { listenSkip(1); });
+el.listenPrev.addEventListener("click", function () { listenSkip(-1); });
+
+el.exportBtn.addEventListener("click", function () {
+  // No download, no server: the JSON goes on screen and into the
+  // clipboard if the browser allows it. Works from a file:// URL, which
+  // a download link would not.
+  el.exportBox.value = JSON.stringify(state, null, 2);
+  el.exportBox.classList.remove("hidden");
+  el.exportBox.select();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(el.exportBox.value).then(function () {
+      el.exportBtn.textContent = "Copied to clipboard";
+    }).catch(function () {
+      el.exportBtn.textContent = "Select and copy the text below";
+    });
+  }
+});
+
+el.resetBtn.addEventListener("click", function () {
+  if (!window.confirm("Erase all progress and start over? This cannot be undone.")) return;
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(LEGACY_KEY);
+  } catch (err) { console.warn(err); }
+  deck = buildDeck();
+  state = { version: 3, progress: {}, newTracker: { date: "", count: 0 } };
+  ensureDefaults();
+  save();
+  showTab("study");
+});
+
+// Keyboard shortcuts. Useless on a phone, but this is also the fastest
+// way to work through a session at a desk, and it costs eight lines.
+document.addEventListener("keydown", function (event) {
+  if (el.body.classList.contains("in-session")) {
+    if (event.key === " " || event.key === "Enter") { event.preventDefault(); flip(); }
+    if (event.key === "1" || event.key === "ArrowLeft")  markWrong();
+    if (event.key === "2" || event.key === "ArrowRight") markCorrect();
+    if (event.key === "Escape") endSession();
+  } else if (activeTab === "listen" && event.key === " " &&
+             document.activeElement === document.body) {
+    event.preventDefault();
+    listenToggle();
+  }
+});
+
+// A half-alive loop that resumes wrong when the driver comes back is
+// worse than a stop, so hiding the page stops playback outright.
+document.addEventListener("visibilitychange", function () {
+  if (document.hidden) listenStop();
+});
+
+// Voices load asynchronously in Chrome, so the first getVoices() call
+// usually comes back empty. The browser fires voiceschanged when the
+// list is ready, which is when we get to pick properly.
 if (TTS_SUPPORTED) {
-  pickSpanishVoice();
+  pickVoices();
   window.speechSynthesis.addEventListener("voiceschanged", function () {
-    pickSpanishVoice();
-    renderVoiceNote();
+    pickVoices();
+    if (activeTab === "stats") renderStats();
+    if (activeTab === "listen") renderListen();
   });
 }
+
+// A small surface for the browser console and for the test suite. Not
+// used by the app itself.
+window.jobsite = {
+  deck: function () { return deck; },
+  state: function () { return state; },
+  listen: listen,
+  cardId: cardId,
+  cardKey: cardKey,
+  auditDeck: auditDeck,
+  STORAGE_KEY: STORAGE_KEY,
+  LEGACY_KEY: LEGACY_KEY,
+  BOX_INTERVALS: BOX_INTERVALS,
+  NEW_PER_DAY: NEW_PER_DAY,
+  todayKey: todayKey,
+  addDays: addDays,
+  session: function () {
+    return {
+      queueLength: queue.length,
+      currentId: current ? current.id : null,
+      answerShown: answerShown,
+      retried: retried.slice(),
+      right: sessionRight,
+      wrong: sessionWrong
+    };
+  },
+  // The exact functions that run while Listen mode is playing, as text.
+  // The suite asserts none of them can grade or commit a card.
+  listenPlayPathSource: function () {
+    return [listenToggle, listenStart, listenPlayCurrent, listenRunStep,
+            listenSpeak, listenBuildPlan, listenBuildDeck, listenAdvance,
+            listenSkip, listenRenderNowPlaying, listenAfter].map(String).join("\n");
+  }
+};
 
 deck = buildDeck();
 auditDeck();
 load();
-renderHome();
+ensureDefaults();
+renderTabbar();
+showTab("study");
 </script>
 </body>
 </html>
