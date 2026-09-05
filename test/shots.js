@@ -45,15 +45,16 @@ const FAKE_VOICES = () => {
     const progress = {};
     deck.slice(0, 96).forEach((c, i) => {
       const box = spread[i % spread.length];
-      progress[c.id] = {
+      progress[c.key] = {
         box, introduced: true,
         nextReview: window.jobsite.addDays(today, i % 7 === 0 ? 0 : (i % 5) + 1)
       };
     });
     localStorage.setItem(window.jobsite.STORAGE_KEY, JSON.stringify({
-      version: 3, progress,
-      newTracker: { date: '', count: 0 },
-      streak: { last: today, days: 11 }
+      v: 3, progress,
+      streak: { last: today, days: 11 },
+      listen: { order: 'es-en', gap: 3000, repeat: false, scope: 'learning' },
+      session: null
     }));
   });
   await p.reload();
@@ -64,10 +65,10 @@ const FAKE_VOICES = () => {
   await p.screenshot({ path: OUT + '/03-listen.png', fullPage: true });
 
   await p.click('[data-tab="browse"]');  await p.waitForTimeout(150);
-  await p.fill('#searchInput', 'esling');
+  await p.fill('#searchBox', 'esling');
   await p.waitForTimeout(120);
   await p.screenshot({ path: OUT + '/04-browse-search.png' });
-  await p.fill('#searchInput', '');
+  await p.fill('#searchBox', '');
   await p.waitForTimeout(120);
   await p.screenshot({ path: OUT + '/05-browse.png' });
 
@@ -83,14 +84,14 @@ const FAKE_VOICES = () => {
   // A long phrase, to check the type ramps down instead of overflowing.
   await p.evaluate(() => {
     const d = window.jobsite.deck();
-    const long = d.find(c => c.en === "There's lightning, come down.");
+    const long = d.find(c => c.en === "There's lightning. Come down.");
     document.getElementById('promptText').textContent = long.en;
-    document.getElementById('promptText').className = 'term term--long';
+    document.getElementById('promptText').className = 'term is-long';
     document.getElementById('answerText').textContent = long.es;
-    document.getElementById('answerText').className = 'term term--long';
-    document.getElementById('cardTrade').textContent = long.trade;
-    document.getElementById('regionText').textContent = 'Los relámpagos is the flash, los rayos is the strike';
-    document.getElementById('regionText').classList.remove('hidden');
+    document.getElementById('answerText').className = 'term is-long';
+    document.getElementById('tradeTag').textContent = long.trade;
+    document.getElementById('regionalNote').textContent = 'Los relámpagos is the flash, los rayos is the strike';
+    document.getElementById('regionalNote').hidden = false;
   });
   await p.waitForTimeout(120);
   await p.screenshot({ path: OUT + '/09-session-long-phrase.png' });
@@ -98,10 +99,11 @@ const FAKE_VOICES = () => {
   await p.click('#gotItBtn'); await p.waitForTimeout(200);
   await p.evaluate(() => {
     let guard = 0;
-    while (window.jobsite.session().currentId && guard++ < 400) {
+    while (window.jobsite.session().currentKey && guard++ < 400) {
       document.getElementById('flipBtn').click();
       document.getElementById(guard % 5 === 0 ? 'missedBtn' : 'gotItBtn').click();
-      if (!document.getElementById('doneScreen').classList.contains('hidden')) break;
+      const done = document.getElementById('studyDone');
+      if (done && !done.hidden) break;
     }
   });
   await p.waitForTimeout(250);

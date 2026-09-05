@@ -1,8 +1,9 @@
 # Jobsite Spanish
 
 Construction-Spanish vocabulary trainer for English-speaking supervisors
-running Texas crews. 393 cards across 13 trades, Leitner spaced repetition,
-hands-free Listen mode, and offline text-to-speech.
+running Texas crews. 387 cards across 13 trades, Leitner spaced repetition
+with session-based new-word rotation, hands-free Listen mode, and offline
+text-to-speech.
 
 The whole app is **`index.html`**. No framework, no bundler, no npm, no build
 step, no CDN. Open it from disk with the network off and it works. It is
@@ -16,8 +17,9 @@ looks right.
 
 ```
 npm install
-node test/acceptance.js     # 45 assertions: data, scheduler, UI, Listen mode
+node test/acceptance.js     # 50 assertions: data, scheduler, UI, Listen mode
 node test/shots.js          # screenshots of every screen at 390x844
+node test/smoke.js          # quick sanity check, no assertions
 ```
 
 Screenshots land in `test/screenshots/` (gitignored). If Chromium isn't where
@@ -29,12 +31,13 @@ Screenshots land in `test/screenshots/` (gitignored). If Chromium isn't where
 |---|---|
 | 1 | `SEED_TERMS` — the vocabulary, the only place card text exists |
 | 2 | Dates, as `"YYYY-MM-DD"` strings and never `Date` objects |
-| 3 | Leitner boxes, intervals, `NEW_PER_DAY` |
-| 4 | Card identity — why a card is not its array index |
+| 3 | Card identity — why a card is not its array index |
+| 4 | Leitner boxes and intervals (long-term mastery, tracked in the background) |
 | 5 | The deck, the save file, and the v2 migration |
-| 6 | Reading the state; streak |
+| 6 | Queries over the deck; streak |
 | 7 | Speech and voice selection |
-| 8–13 | Session state, tab shell, Study, Browse, Stats |
+| 8 | Session-based new-word rotation — no daily quota; new cards flow into a session at roughly a 30/70 ratio against reviews and graduate out after 2 correct answers, replaced from the pool in real time |
+| 9–13 | Session state, tab shell, Study, Browse, Stats |
 | 14 | Listen mode, and the three browser bugs it works around |
 | 15 | Wiring and boot |
 

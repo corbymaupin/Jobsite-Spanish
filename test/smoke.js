@@ -9,7 +9,7 @@ const path = require('path');
   await p.goto('file://' + path.resolve('index.html'));
   await p.waitForTimeout(300);
   console.log('deck size:', await p.evaluate(() => window.jobsite.deck().length));
-  console.log('tabs:', await p.$$eval('.tabbar__btn', n => n.map(x => x.textContent.trim())));
+  console.log('tabs:', await p.$$eval('.tab', n => n.map(x => x.textContent.trim())));
   console.log('errors:', errs);
   await b.close();
 })();
