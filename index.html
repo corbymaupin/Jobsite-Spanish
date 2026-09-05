@@ -550,18 +550,139 @@ function calculateNextReview(box) {
 
 
 /* =================================================================
-   4. SAVING AND LOADING
+   4. CARD IDENTITY
+
+   v2 gave every card `id: index` - its position in SEED_TERMS - and
+   then wrote the WHOLE card, English and Spanish included, into
+   localStorage. That works exactly until the day the deck changes.
+   Insert one term in the middle and every id after it slides by one:
+
+       old array:  [0] concrete  [1] cement  [2] rebar
+       saved:      id 2 is in box 5 - known cold
+       new array:  [0] concrete  [1] cement  [2] curing  [3] rebar
+       on load:    id 2 is now "curing", and the app believes it is
+                   mastered
+
+   Nothing throws. Progress just silently re-attaches to the wrong
+   words across the whole deck. This release inserts ~130 cards
+   throughout the list, so that failure would have been total.
+
+   The fix is to derive identity from something that travels WITH the
+   card - its own text - instead of from where it happens to sit.
+   ================================================================= */
+
+function cardKey(term) {
+  // Lowercased and whitespace-flattened so a stray double space in the
+  // seed data doesn't count as a different card.
+  return (term.en + "|" + term.es).toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+function cardId(term) {
+  // FNV-1a hash: walk the characters, XOR each into a running number,
+  // multiply by a fixed prime. Math.imul does the multiply in 32-bit
+  // integers, which plain * would not.
+  //
+  // Why hash at all, when "concrete|el concreto" is already unique?
+  // Because the hash is what goes in localStorage, and the save file
+  // must not contain any English or Spanish. The whole point of this
+  // rewrite is that card text lives in SEED_TERMS and nowhere else:
+  // fix a typo in a translation and every user gets the correction on
+  // their next load. Storing the text as the key would freeze today's
+  // wording into their browser permanently, which is the same trap in
+  // a different shape.
+  const text = cardKey(term);
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(36);   // base 36 keeps it to ~6 characters
+}
+
+
+/* =================================================================
+   5. THE DECK AND THE SAVE FILE
+
+   `deck` is the live array the app works with: the text from
+   SEED_TERMS plus the three fields that change (box, introduced,
+   nextReview). It is rebuilt from scratch on every load.
+
+   The save file holds ONLY those three changing fields, keyed by
+   card id. That split is the whole design:
+
+       SEED_TERMS  ->  what the words are     (ships with the app)
+       localStorage ->  how well you know them (belongs to the user)
 
    localStorage is a small box of text the browser keeps for this
    page. It only holds strings, so state goes in as JSON and gets
    parsed back on the way out.
    ================================================================= */
 
-const STORAGE_KEY = "jobsite-spanish-v2";
+const STORAGE_KEY = "jobsite-spanish-v3";
+const LEGACY_KEY  = "jobsite-spanish-v2";
 
-let state = { terms: [], newTracker: { date: "", count: 0 } };
+let deck = [];
+let state = { version: 3, progress: {}, newTracker: { date: "", count: 0 } };
+
+function buildDeck() {
+  return SEED_TERMS.map(function (term) {
+    // Object.assign copies the seed fields into a NEW object, so
+    // SEED_TERMS itself is never modified.
+    return Object.assign({}, term, {
+      id: cardId(term),
+      box: 1,
+      introduced: false,   // hasn't been shown yet
+      nextReview: null     // no schedule until it's introduced
+    });
+  });
+}
+
+function auditDeck() {
+  // Two cards that hash to the same id would share one progress
+  // record and quietly corrupt each other. The deck deliberately
+  // contains homonyms - la escalera is both ladder and stairs, el
+  // nivel is both the tool and the elevation - but those differ on
+  // the English side, so their ids differ too. This check is here to
+  // catch the day someone pastes a line twice.
+  const seen = {};
+  let clashes = 0;
+  deck.forEach(function (card) {
+    if (seen[card.id]) {
+      clashes++;
+      console.warn('Duplicate card id "' + card.id + '": "' + seen[card.id] +
+                   '" and "' + card.en + '" would share progress.');
+    }
+    seen[card.id] = card.en;
+  });
+  return clashes;
+}
+
+function hydrateDeck() {
+  // Copy saved progress onto the live deck. A card with no saved
+  // record is simply untouched: box 1, not introduced. That is also
+  // what a brand new card added in a future release looks like, which
+  // is why nothing needs to be written for cards you've never seen.
+  deck.forEach(function (card) {
+    const p = state.progress[card.id];
+    if (!p) return;
+    card.box = p.box || 1;
+    card.introduced = p.introduced === true;
+    card.nextReview = p.nextReview || null;
+  });
+}
 
 function save() {
+  const progress = {};
+  deck.forEach(function (card) {
+    if (!card.introduced) return;   // nothing worth remembering yet
+    progress[card.id] = {
+      box: card.box,
+      introduced: true,
+      nextReview: card.nextReview
+    };
+  });
+  state.progress = progress;
+
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch (err) {
@@ -571,19 +692,45 @@ function save() {
   }
 }
 
-function buildFreshState() {
+function migrateFromV2() {
+  // v2 saved the entire card object, text and all. That is the bug -
+  // and it is also what makes the rescue possible, because the saved
+  // English and Spanish are enough to recompute the new id. Match on
+  // text, carry the schedule, drop anything the deck no longer holds.
+  const raw = localStorage.getItem(LEGACY_KEY);
+  if (!raw) return null;
+
+  let old;
+  try { old = JSON.parse(raw); } catch (err) { return null; }
+  if (!old || !Array.isArray(old.terms) || old.terms.length === 0) return null;
+
+  const live = {};
+  deck.forEach(function (card) { live[card.id] = true; });
+
+  const progress = {};
+  let carried = 0;
+  let dropped = 0;
+
+  old.terms.forEach(function (term) {
+    if (!term || !term.en || !term.es) return;
+    if (!term.introduced) return;         // no progress to rescue
+    const id = cardId(term);
+    if (!live[id]) { dropped++; return; } // retired or reworded card
+    progress[id] = {
+      box: term.box || 1,
+      introduced: true,
+      nextReview: term.nextReview || todayKey()
+    };
+    carried++;
+  });
+
+  console.info("Migrated v2 progress: " + carried + " cards carried, " +
+               dropped + " dropped (no longer in the deck).");
+
   return {
-    terms: SEED_TERMS.map(function (term, index) {
-      // Object.assign copies the seed fields into a NEW object, so
-      // SEED_TERMS itself is never modified.
-      return Object.assign({}, term, {
-        id: index,
-        box: 1,
-        introduced: false,   // hasn't been shown yet
-        nextReview: null     // no schedule until it's introduced
-      });
-    }),
-    newTracker: { date: "", count: 0 }
+    version: 3,
+    progress: progress,
+    newTracker: old.newTracker || { date: "", count: 0 }
   };
 }
 
@@ -592,20 +739,33 @@ function load() {
 
   if (saved) {
     try {
-      state = JSON.parse(saved);
-      if (state.terms && state.terms.length) return;
+      const parsed = JSON.parse(saved);
+      if (parsed && parsed.progress) {
+        state = parsed;
+        if (!state.newTracker) state.newTracker = { date: "", count: 0 };
+        hydrateDeck();
+        return;                            // v3 exists: never look at v2 again
+      }
     } catch (err) {
       console.warn("Saved data was unreadable. Starting fresh.");
     }
   }
 
-  state = buildFreshState();
+  const migrated = migrateFromV2();
+  if (migrated) {
+    state = migrated;
+    hydrateDeck();
+    save();                                // writing v3 makes this a one-time trip
+    return;
+  }
+
+  state = { version: 3, progress: {}, newTracker: { date: "", count: 0 } };
   save();
 }
 
 
 /* =================================================================
-   5. READING THE STATE
+   6. READING THE STATE
    ================================================================= */
 
 function matchesFilter(term) {
@@ -614,7 +774,7 @@ function matchesFilter(term) {
 
 function getTermsDue() {
   const today = todayKey();
-  return state.terms.filter(function (term) {
+  return deck.filter(function (term) {
     return term.introduced && term.nextReview <= today && matchesFilter(term);
   });
 }
@@ -630,14 +790,14 @@ function newCardsLeftToday() {
 function getNewTerms() {
   const room = newCardsLeftToday();
   if (room === 0) return [];
-  return state.terms.filter(function (term) {
+  return deck.filter(function (term) {
     return !term.introduced && matchesFilter(term);
   }).slice(0, room);
 }
 
 function getBoxCounts() {
   const counts = [0, 0, 0, 0, 0];
-  state.terms.forEach(function (term) {
+  deck.forEach(function (term) {
     if (term.introduced) counts[term.box - 1]++;
   });
   return counts;
@@ -653,7 +813,7 @@ function getTrades() {
 
 
 /* =================================================================
-   6. PRONUNCIATION
+   7. PRONUNCIATION
 
    Every modern browser ships a speech engine at window.speechSynthesis.
    No library, no API key, no network call once the voice is on the
@@ -737,7 +897,7 @@ function describeVoice() {
 
 
 /* =================================================================
-   7. SESSION STATE
+   8. SESSION STATE
    Not saved. An interrupted session just starts over.
    ================================================================= */
 
@@ -752,7 +912,7 @@ let activeTrade = "All";
 
 
 /* =================================================================
-   8. SCREENS
+   9. SCREENS
    ================================================================= */
 
 const el = {
@@ -838,16 +998,16 @@ function renderFilter() {
 function renderHome() {
   const due = getTermsDue();
   const fresh = getNewTerms();
-  const introduced = state.terms.filter(function (t) { return t.introduced; }).length;
+  const introduced = deck.filter(function (t) { return t.introduced; }).length;
 
-  el.totalCount.textContent = introduced + " of " + state.terms.length + " started";
+  el.totalCount.textContent = introduced + " of " + deck.length + " started";
   renderGauge();
   renderFilter();
 
   const waiting = due.length + fresh.length;
 
   if (waiting === 0) {
-    const anyLeft = state.terms.some(function (t) { return !t.introduced; });
+    const anyLeft = deck.some(function (t) { return !t.introduced; });
     el.homeBody.innerHTML =
       '<div class="empty">' +
         '<p class="term long">Nothing due</p>' +
@@ -876,7 +1036,7 @@ function renderHome() {
 
 
 /* =================================================================
-   9. RUNNING A SESSION
+   10. RUNNING A SESSION
    ================================================================= */
 
 function shuffle(array) {
@@ -1017,7 +1177,7 @@ function finishSession() {
 
 
 /* =================================================================
-   10. WIRING IT UP
+   11. WIRING IT UP
    ================================================================= */
 
 el.promptSpeak.addEventListener("click", function () { speakSpanish(current.es, el.promptSpeak); });
@@ -1039,6 +1199,8 @@ if (TTS_SUPPORTED) {
   });
 }
 
+deck = buildDeck();
+auditDeck();
 load();
 renderHome();
 </script>
