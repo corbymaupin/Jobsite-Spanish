@@ -96,7 +96,14 @@ const FAKE_VOICES = () => {
   await p.screenshot({ path: OUT + '/09-session-long-phrase.png' });
 
   await p.click('#gotItBtn'); await p.waitForTimeout(200);
-  await p.evaluate(() => { while (window.jobsite.session().queueLength > 0) document.getElementById('flipBtn').click(), document.getElementById('gotItBtn').click(); });
+  await p.evaluate(() => {
+    let guard = 0;
+    while (window.jobsite.session().currentId && guard++ < 400) {
+      document.getElementById('flipBtn').click();
+      document.getElementById(guard % 5 === 0 ? 'missedBtn' : 'gotItBtn').click();
+      if (!document.getElementById('doneScreen').classList.contains('hidden')) break;
+    }
+  });
   await p.waitForTimeout(250);
   await p.screenshot({ path: OUT + '/10-session-done.png' });
 

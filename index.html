@@ -1658,11 +1658,14 @@ function pickVoices() {
 function makeUtterance(text, lang) {
   const u = new SpeechSynthesisUtterance(text);
   const voice = lang === "en" ? englishVoice : spanishVoice;
+  u.lang = lang === "en" ? "en-US" : "es-MX";
   if (voice) {
-    u.voice = voice;
-    u.lang = voice.lang;
-  } else {
-    u.lang = lang === "en" ? "en-US" : "es-MX";
+    // Wrapped because a voice object can go stale - the engine reloads
+    // its list, or the user uninstalls a language - and assigning one it
+    // no longer recognises throws. Falling back to a bare lang tag still
+    // speaks; throwing here would take the Listen chain down with it.
+    try { u.voice = voice; u.lang = voice.lang; }
+    catch (err) { console.warn("Voice rejected, falling back to " + u.lang, err); }
   }
   // Under normal speed for Spanish. Native pace is fine once you know a
   // word, but it blurs the vowels while you're still learning it.
@@ -2276,24 +2279,29 @@ function listenSpeak(text, lang, onDone) {
     onDone();
   }
 
-  if (!TTS_SUPPORTED) {
-    watchdog = setTimeout(settle, 400);
-    listen.timers.push(watchdog);
-    return;
-  }
-
-  const u = makeUtterance(text, lang);
-  u.onend = settle;
-  u.onerror = settle;
-
-  // Generous by design: about eight characters a second plus a second
-  // and a half of slack. A normal utterance always finishes on onend,
-  // so the watchdog only ever fires when the engine has gone silent.
-  watchdog = setTimeout(settle, 1500 + text.length * 120);
+  // The watchdog is armed BEFORE anything is spoken, deliberately. If the
+  // engine throws on the way in - a stale voice, a locked-down WebView -
+  // the chain still advances. Arming it after the speak() call would leave
+  // that one failure mode uncovered, which is the one that stops the loop
+  // dead with no error and no way for the user to tell why.
+  //
+  // Generous by design: about eight characters a second plus a second and
+  // a half of slack. A normal utterance always finishes on onend, so the
+  // watchdog only ever fires when the engine has actually gone silent.
+  watchdog = setTimeout(settle, TTS_SUPPORTED ? 1500 + text.length * 120 : 400);
   listen.timers.push(watchdog);
+  if (!TTS_SUPPORTED) return;
 
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(u);
+  try {
+    const u = makeUtterance(text, lang);
+    u.onend = settle;
+    u.onerror = settle;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+  } catch (err) {
+    console.warn("Speech engine refused an utterance, skipping ahead:", err);
+    settle();
+  }
 }
 
 function listenBuildPlan(card) {
