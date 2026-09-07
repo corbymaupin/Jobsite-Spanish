@@ -588,6 +588,59 @@ body.immersive .tabbar { transform: translateY(110%); }
 .chip .n { opacity: .65; font-variant-numeric: tabular-nums; }
 
 /* ===================================================================
+   LANGUAGE TOGGLE (Study home — which side of the deck you're learning)
+
+   A track-and-thumb switch, not a checkbox, because the two states
+   ("learning English" / "learning Spanish") are equally valid defaults
+   for different users — a checkbox visually implies an off/on,
+   default/exception relationship that doesn't apply here. The two
+   labels sit on either side of the track itself so the switch reads
+   as "pick a side" rather than "toggle a setting."
+   =================================================================== */
+
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  margin-bottom: 1rem;
+}
+.lang-toggle-label {
+  font-size: var(--t-sm);
+  font-weight: 650;
+  color: var(--ink-3);
+  transition: color 160ms var(--ease);
+}
+.lang-toggle-label.is-active { color: var(--ink); }
+
+.lang-switch {
+  appearance: none;
+  position: relative;
+  flex-shrink: 0;
+  width: 50px;
+  height: 28px;
+  padding: 0;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  border: 1px solid var(--line-2);
+  cursor: pointer;
+}
+.lang-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--orange-lit), var(--orange));
+  box-shadow: 0 1px 3px rgba(0,0,0,.4);
+  transition: transform 200ms var(--ease);
+}
+/* aria-checked = "true" means English-learning mode (left side).
+   Default / unchecked = Spanish-learning mode (right side). */
+.lang-switch[aria-checked="false"] .lang-switch-thumb { transform: translateX(22px); }
+
+/* ===================================================================
    STATS
 
    The gauge is five bars, one per Leitner box, anchored to a shared
@@ -829,23 +882,24 @@ kbd {
     <!-- Home state: what's due, and the button that starts a session -->
     <div id="studyHome">
       <div class="panel">
-        <p class="panel-title">Today</p>
+        <p class="panel-title" data-i18n="today">Today</p>
         <div class="kpis">
-          <div class="kpi"><div class="kpi-n" id="kDue">0</div><div class="kpi-l">Due</div></div>
-          <div class="kpi"><div class="kpi-n" id="kNew">0</div><div class="kpi-l">New</div></div>
-          <div class="kpi"><div class="kpi-n" id="kKnown">0</div><div class="kpi-l">Mastered</div></div>
+          <div class="kpi"><div class="kpi-n" id="kDue">0</div><div class="kpi-l" data-i18n="due">Due</div></div>
+          <div class="kpi"><div class="kpi-n" id="kNew">0</div><div class="kpi-l" data-i18n="new">New</div></div>
+          <div class="kpi"><div class="kpi-n" id="kKnown">0</div><div class="kpi-l" data-i18n="mastered">Mastered</div></div>
         </div>
         <div class="gap-lg"></div>
         <div id="startArea"></div>
       </div>
 
       <div class="panel" id="homeSettings">
-        <p class="panel-title">Learning mode</p>
-        <div style="display: flex; gap: 0.875rem; margin-bottom: 1rem; align-items: center;">
-          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; flex: 1;">
-            <input type="checkbox" id="bilingualToggle" style="width: 18px; height: 18px; cursor: pointer;">
-            <span id="bilingualLabel" style="color: var(--ink-2); font-size: 0.875rem;">Aprender Español</span>
-          </label>
+        <p class="panel-title" data-i18n="learningMode">Learning mode</p>
+        <div class="lang-toggle">
+          <span class="lang-toggle-label" id="langLabelEn">Aprender Inglés</span>
+          <button type="button" class="lang-switch" id="bilingualToggle" role="switch" aria-checked="false" aria-label="Toggle learning language">
+            <span class="lang-switch-thumb"></span>
+          </button>
+          <span class="lang-toggle-label" id="langLabelEs">Aprender Español</span>
         </div>
         <select id="categorySelect" style="width: 100%; padding: 0.625rem; background: var(--surface-2); color: var(--ink); border: 1px solid var(--line); border-radius: var(--r-sm); font-size: 0.875rem; cursor: pointer;">
           <option value="All">Todas las categorías</option>
@@ -853,12 +907,12 @@ kbd {
       </div>
 
       <div class="panel" id="homeProgress" hidden>
-        <p class="panel-title">Where your cards sit</p>
+        <p class="panel-title" data-i18n="whereCardsSit">Where your cards sit</p>
         <div class="gauge" id="homeGauge" style="height:3.75rem"></div>
       </div>
 
       <div class="panel">
-        <p class="panel-title">Focus a trade</p>
+        <p class="panel-title" data-i18n="focusATrade">Focus a trade</p>
         <div class="chips" id="tradeChips"></div>
         <p class="faint" style="margin:.875rem 0 0" id="chipHint"></p>
       </div>
@@ -880,7 +934,7 @@ kbd {
                  stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/>
             </svg>
-            Hear it
+            <span data-i18n="hearIt">Hear it</span>
           </button>
         </div>
 
@@ -891,7 +945,7 @@ kbd {
                  stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/>
             </svg>
-            Hear it
+            <span data-i18n="hearIt">Hear it</span>
           </button>
           <p class="regional" id="regionalNote" hidden></p>
         </div>
@@ -899,37 +953,40 @@ kbd {
 
       <div class="gap-lg"></div>
 
-      <button class="btn btn-primary" id="flipBtn">Show answer</button>
+      <button class="btn btn-primary" id="flipBtn" data-i18n="showAnswer">Show answer</button>
 
       <div class="btn-row" id="verdictRow" hidden>
-        <button class="btn btn-bad" id="missedBtn">Missed it</button>
-        <button class="btn btn-good" id="gotItBtn">Got it</button>
+        <button class="btn btn-bad" id="missedBtn" data-i18n="missedIt">Missed it</button>
+        <button class="btn btn-good" id="gotItBtn" data-i18n="gotIt">Got it</button>
       </div>
 
       <p class="kbd-hint">
-        <kbd>Space</kbd> reveal &nbsp;·&nbsp; <kbd>1</kbd> missed &nbsp;·&nbsp; <kbd>2</kbd> got it &nbsp;·&nbsp; <kbd>S</kbd> hear it
+        <kbd>Space</kbd> <span data-i18n="kbdReveal">reveal</span> &nbsp;·&nbsp;
+        <kbd>1</kbd> <span data-i18n="kbdMissed">missed</span> &nbsp;·&nbsp;
+        <kbd>2</kbd> <span data-i18n="kbdGotIt">got it</span> &nbsp;·&nbsp;
+        <kbd>S</kbd> <span data-i18n="kbdHearIt">hear it</span>
       </p>
 
       <div class="gap-lg"></div>
-      <button class="btn btn-ghost btn-quiet" id="endBtn">End session</button>
+      <button class="btn btn-ghost btn-quiet" id="endBtn" data-i18n="endSession">End session</button>
     </div>
 
     <!-- Session complete -->
     <div id="studyDone" hidden>
       <div class="panel center">
-        <p class="panel-title" style="margin-bottom:1rem">Session complete</p>
+        <p class="panel-title" style="margin-bottom:1rem" data-i18n="sessionComplete">Session complete</p>
         <div class="kpis">
-          <div class="kpi"><div class="kpi-n" id="dRight" style="color:var(--good)">0</div><div class="kpi-l">Right</div></div>
-          <div class="kpi"><div class="kpi-n" id="dWrong" style="color:var(--bad)">0</div><div class="kpi-l">Missed</div></div>
-          <div class="kpi"><div class="kpi-n" id="dPct">0%</div><div class="kpi-l">Accuracy</div></div>
+          <div class="kpi"><div class="kpi-n" id="dRight" style="color:var(--good)">0</div><div class="kpi-l" data-i18n="right">Right</div></div>
+          <div class="kpi"><div class="kpi-n" id="dWrong" style="color:var(--bad)">0</div><div class="kpi-l" data-i18n="missed">Missed</div></div>
+          <div class="kpi"><div class="kpi-n" id="dPct">0%</div><div class="kpi-l" data-i18n="accuracy">Accuracy</div></div>
         </div>
         <div class="gap-lg"></div>
         <p class="faint" id="doneNote"></p>
       </div>
       <div class="gap-lg"></div>
       <div class="stack">
-        <button class="btn btn-primary" id="againBtn">Keep going</button>
-        <button class="btn btn-ghost" id="doneBackBtn">Back to start</button>
+        <button class="btn btn-primary" id="againBtn" data-i18n="keepGoing">Keep going</button>
+        <button class="btn btn-ghost" id="doneBackBtn" data-i18n="backToStart">Back to start</button>
       </div>
     </div>
 
@@ -2168,6 +2225,89 @@ let activeTab = "study";
 let isBilingual = false;                   // true = learn English, false = learn Spanish
 let activeCategory = "All";                // "All" = normal Leitner, or a trade name = pure practice mode
 
+/* ===================================================================
+   UI TEXT (Study tab only)
+
+   An English speaker learning Spanish wants an English interface —
+   that's the default. Someone using this app to learn English wants
+   the interface in the language they already read fluently, which is
+   Spanish. So the interface language is tied to the *learning* toggle,
+   not a separate setting: flipping "Aprender Inglés" on flips every
+   label on this screen to Spanish at the same time.
+
+   Only the Study tab (home, session, done) is covered — that's the
+   entire surface the bilingual toggle touches. Listen/Browse/Stats
+   stay in English regardless of mode; extending this table to those
+   tabs is straightforward if it's ever wanted, but wasn't asked for
+   here and would roughly double the size of this table for screens
+   the toggle doesn't otherwise affect.
+
+   Trade names (Concrete, Framing, MEP, ...) are left untranslated in
+   both languages — they're proper nouns for the categories, and a
+   crew member learning English still needs to recognize "Concrete"
+   as a Play Store / job-site term either way.
+   =================================================================== */
+const UI_TEXT = {
+  en: {
+    today: "Today", due: "Due", new: "New", mastered: "Mastered",
+    learningMode: "Learning mode",
+    whereCardsSit: "Where your cards sit",
+    focusATrade: "Focus a trade",
+    showAnswer: "Show answer", missedIt: "Missed it", gotIt: "Got it",
+    endSession: "End session", hearIt: "Hear it",
+    kbdReveal: "reveal", kbdMissed: "missed", kbdGotIt: "got it", kbdHearIt: "hear it",
+    sessionComplete: "Session complete",
+    right: "Right", missed: "Missed", accuracy: "Accuracy",
+    keepGoing: "Keep going", backToStart: "Back to start",
+    continuePrefix: "Continue", startPrefix: "Start", card: "card", cards: "cards",
+    nothingDue: "Nothing due", inTrade: " in ",
+    nothingDueBody: "Everything here is scheduled out, or the whole trade is mastered. Boxes 4 and 5 take 8 and 16 days to come back around.",
+    chipHintOwed: "Numbers are reviews owed. New words rotate in continuously during a session as you learn them.",
+    chipHintClear: "No reviews owed yet. New words rotate in continuously as you get them right twice.",
+    noCardsIn: "No cards in",
+    noCardsInBody: "This category has no cards. Try selecting another one.",
+    newTag: "New",
+    noCardsReviewed: "No cards reviewed.",
+    moreWaiting: "more waiting whenever you are.",
+    nothingElseDue: "Nothing else due right now. Come back later.",
+    practiceComplete: "Practice complete."
+  },
+  es: {
+    today: "Hoy", due: "Por revisar", new: "Nuevo", mastered: "Dominado",
+    learningMode: "Modo de aprendizaje",
+    whereCardsSit: "Dónde están tus tarjetas",
+    focusATrade: "Enfoca un oficio",
+    showAnswer: "Mostrar respuesta", missedIt: "No lo sabía", gotIt: "¡Lo sabía!",
+    endSession: "Terminar sesión", hearIt: "Escuchar",
+    kbdReveal: "revelar", kbdMissed: "no lo sabía", kbdGotIt: "lo sabía", kbdHearIt: "escuchar",
+    sessionComplete: "Sesión completa",
+    right: "Correctas", missed: "Falladas", accuracy: "Precisión",
+    keepGoing: "Seguir", backToStart: "Volver al inicio",
+    continuePrefix: "Continuar", startPrefix: "Comenzar", card: "tarjeta", cards: "tarjetas",
+    nothingDue: "Nada pendiente", inTrade: " en ",
+    nothingDueBody: "Todo aquí está programado, o todo el oficio está dominado. Las cajas 4 y 5 tardan 8 y 16 días en volver.",
+    chipHintOwed: "Los números son repasos pendientes. Las palabras nuevas van rotando durante la sesión a medida que las aprendes.",
+    chipHintClear: "Aún no hay repasos pendientes. Las palabras nuevas van rotando a medida que las aciertas dos veces.",
+    noCardsIn: "No hay tarjetas en",
+    noCardsInBody: "Esta categoría no tiene tarjetas. Prueba con otra.",
+    newTag: "Nuevo",
+    noCardsReviewed: "No se repasó ninguna tarjeta.",
+    moreWaiting: "más esperando cuando quieras.",
+    nothingElseDue: "No hay nada más pendiente por ahora. Vuelve más tarde.",
+    practiceComplete: "Práctica completa."
+  }
+};
+
+// English-learning mode (isBilingual) shows Spanish UI text, since
+// that's the language its Spanish-speaking user reads fluently.
+function T(key) { return UI_TEXT[isBilingual ? "es" : "en"][key]; }
+
+function applyStaticI18n() {
+  document.querySelectorAll("[data-i18n]").forEach(function (el) {
+    el.textContent = T(el.getAttribute("data-i18n"));
+  });
+}
+
 function shuffle(a) {
   // Fisher-Yates: walk backwards, swapping each item with a random
   // earlier one. Every ordering is equally likely, which the simpler
@@ -2269,31 +2409,36 @@ function renderBilingualSettings() {
     select.appendChild(opt);
   });
 
-  // Set current values
-  const bilingual = $("bilingualToggle");
-  bilingual.checked = isBilingual;
-  bilingual.addEventListener("change", function () {
-    isBilingual = bilingual.checked;
+  // .onclick/.onchange (not addEventListener) because this function
+  // reruns on every renderStudyHome() call — a trade chip click, a
+  // category change, anything. addEventListener would stack a new
+  // listener each time; assigning .onclick replaces the old one.
+  const toggle = $("bilingualToggle");
+  toggle.setAttribute("aria-checked", String(isBilingual));
+  toggle.onclick = function () {
+    isBilingual = !isBilingual;
     state.bilingual = isBilingual;
     save();
-    updateBilingualLabel();
-    // If in category mode, category mode continues. If not, nothing changes for display.
-  });
+    toggle.setAttribute("aria-checked", String(isBilingual));
+    updateLangLabels();
+    applyStaticI18n();
+    renderStudyHome();   // rebuilds Start/Continue button text in the new language
+  };
 
   select.value = activeCategory;
-  select.addEventListener("change", function () {
+  select.onchange = function () {
     activeCategory = select.value;
     state.categoryMode = activeCategory;
     save();
     renderStudyHome();  // Refresh to show/hide progress gauge
-  });
+  };
 
-  updateBilingualLabel();
+  updateLangLabels();
 }
 
-function updateBilingualLabel() {
-  const label = $("bilingualLabel");
-  label.textContent = isBilingual ? "Aprender Inglés" : "Aprender Español";
+function updateLangLabels() {
+  $("langLabelEn").classList.toggle("is-active", isBilingual);
+  $("langLabelEs").classList.toggle("is-active", !isBilingual);
 }
 
 function renderStudyHome() {
@@ -2310,14 +2455,15 @@ function renderStudyHome() {
     renderStreakChip();
 
     if (total > 0) {
-      area.innerHTML = '<button class="btn btn-primary" id="startBtn">Start · ' + total + ' card' + (total === 1 ? '' : 's') + '</button>';
+      const cardWord = total === 1 ? T("card") : T("cards");
+      area.innerHTML = '<button class="btn btn-primary" id="startBtn">' + T("startPrefix") + ' · ' + total + ' ' + cardWord + '</button>';
       $("startBtn").addEventListener("click", startSession);
     } else {
       area.innerHTML =
         '<div class="empty">' +
           '<svg class="empty-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg>' +
-          "<h3>No cards in " + activeCategory + "</h3>" +
-          "<p>This category has no cards. Try selecting another one.</p>" +
+          "<h3>" + T("noCardsIn") + " " + activeCategory + "</h3>" +
+          "<p>" + T("noCardsInBody") + "</p>" +
         "</div>";
     }
     // Hide progress gauge in category mode
@@ -2337,18 +2483,19 @@ function renderStudyHome() {
 
     if (hasResumable) {
       const remaining = state.session.keys.length;
-      area.innerHTML = '<button class="btn btn-primary" id="startBtn">Continue · ' + remaining + ' card' + (remaining === 1 ? '' : 's') + '</button>';
+      const cardWord = remaining === 1 ? T("card") : T("cards");
+      area.innerHTML = '<button class="btn btn-primary" id="startBtn">' + T("continuePrefix") + ' · ' + remaining + ' ' + cardWord + '</button>';
       $("startBtn").addEventListener("click", startSession);
     } else if (total > 0) {
-      area.innerHTML = '<button class="btn btn-primary" id="startBtn">Start · ' + total + ' card' + (total === 1 ? '' : 's') + '</button>';
+      const cardWord = total === 1 ? T("card") : T("cards");
+      area.innerHTML = '<button class="btn btn-primary" id="startBtn">' + T("startPrefix") + ' · ' + total + ' ' + cardWord + '</button>';
       $("startBtn").addEventListener("click", startSession);
     } else {
       area.innerHTML =
         '<div class="empty">' +
           '<svg class="empty-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg>' +
-          "<h3>Nothing due" + (activeTrade === "All" ? "" : " in " + activeTrade) + "</h3>" +
-          "<p>Everything here is scheduled out, or the whole trade is mastered. " +
-          "Boxes 4 and 5 take 8 and 16 days to come back around.</p>" +
+          "<h3>" + T("nothingDue") + (activeTrade === "All" ? "" : T("inTrade") + activeTrade) + "</h3>" +
+          "<p>" + T("nothingDueBody") + "</p>" +
         "</div>";
     }
 
@@ -2364,9 +2511,7 @@ function renderStudyHome() {
   }, true);
 
   const owed = dueCards("All").length;
-  $("chipHint").textContent = owed > 0
-    ? "Numbers are reviews owed. New words rotate in continuously during a session as you learn them."
-    : "No reviews owed yet. New words rotate in continuously as you get them right twice.";
+  $("chipHint").textContent = owed > 0 ? T("chipHintOwed") : T("chipHintClear");
 
   // Render bilingual toggle and category dropdown
   renderBilingualSettings();
@@ -2443,7 +2588,7 @@ function nextCard() {
 
   const isNew = isNewCard(current);
   const tag = $("tradeTag");
-  tag.textContent = isNew ? "New · " + current.trade : current.trade;
+  tag.textContent = isNew ? T("newTag") + " · " + current.trade : current.trade;
   tag.classList.toggle("is-new", isNew);
 
   $("studyCard").classList.toggle("is-phrase", current.trade === "Phrases");
@@ -2578,24 +2723,36 @@ function finishSession() {
   $("dWrong").textContent = sessionWrong;
   $("dPct").textContent = pct + "%";
 
-  // Ending with cards still in the queue (the "End session" button,
-  // mid-way through) leaves the working set saved so the home screen
-  // offers "Continue" next time. Ending with the queue actually empty
-  // means the working set is spent, so there's nothing to resume.
-  if (queue.length === 0) {
-    clearSession();
-  } else {
-    session.keys = queue.map(function (c) { return c.key; });
-    saveSession(session);
+  // Category mode is pure practice with no persisted working set — never
+  // touch state.session here, or ending a practice round would clobber
+  // (or wrongly clear) whatever real Leitner session is saved for resume.
+  if (!session.isCategoryMode) {
+    // Ending with cards still in the queue (the "End session" button,
+    // mid-way through) leaves the working set saved so the home screen
+    // offers "Continue" next time. Ending with the queue actually empty
+    // means the working set is spent, so there's nothing to resume.
+    if (queue.length === 0) {
+      clearSession();
+    } else {
+      session.keys = queue.map(function (c) { return c.key; });
+      saveSession(session);
+    }
   }
 
-  const leftOver = dueCards(activeTrade).length + uninitiatedCards(activeTrade).length;
-  $("doneNote").textContent = total === 0
-    ? "No cards reviewed."
-    : (leftOver > 0
-        ? leftOver + " more waiting whenever you are."
-        : "Nothing else due right now. Come back later.");
-  $("againBtn").hidden = (leftOver === 0);
+  if (session.isCategoryMode) {
+    // Practice mode has no "due" concept — the whole category is always
+    // available again, so there's always a "keep going."
+    $("doneNote").textContent = T("practiceComplete");
+    $("againBtn").hidden = false;
+  } else {
+    const leftOver = dueCards(activeTrade).length + uninitiatedCards(activeTrade).length;
+    $("doneNote").textContent = total === 0
+      ? T("noCardsReviewed")
+      : (leftOver > 0
+          ? leftOver + " " + T("moreWaiting")
+          : T("nothingElseDue"));
+    $("againBtn").hidden = (leftOver === 0);
+  }
 
   renderStreakChip();
   setStudyView("done");
@@ -3155,6 +3312,7 @@ load();
 // Initialize bilingual and category mode from saved state
 isBilingual = state.bilingual || false;
 activeCategory = state.categoryMode || "All";
+applyStaticI18n();   // static Study-tab labels (session screen, done screen) — see UI TEXT above
 goTab("study");
 </script>
 </body>
