@@ -899,10 +899,10 @@ kbd {
           <button type="button" class="lang-switch" id="bilingualToggle" role="switch" aria-checked="false" aria-label="Toggle learning language">
             <span class="lang-switch-thumb"></span>
           </button>
-          <span class="lang-toggle-label" id="langLabelEs">Aprender Español</span>
+          <span class="lang-toggle-label" id="langLabelEs">Learning Spanish</span>
         </div>
         <select id="categorySelect" style="width: 100%; padding: 0.625rem; background: var(--surface-2); color: var(--ink); border: 1px solid var(--line); border-radius: var(--r-sm); font-size: 0.875rem; cursor: pointer;">
-          <option value="All">Todas las categorías</option>
+          <option value="All">Choose a category</option>
         </select>
       </div>
 
@@ -2271,11 +2271,7 @@ const UI_TEXT = {
     moreWaiting: "more waiting whenever you are.",
     nothingElseDue: "Nothing else due right now. Come back later.",
     practiceComplete: "Practice complete.",
-    // Deliberately the odd one out: every other key here is the English
-    // *interface* text shown during Spanish-learning mode. This one is
-    // the Spanish default-option text ("Todas las categorías") that was
-    // already correct before English mode existed, kept unchanged.
-    allCategories: "Todas las categorías"
+    allCategories: "Choose a category"
   },
   es: {
     today: "Hoy", due: "Por revisar", new: "Nuevo", mastered: "Dominado",
@@ -2300,7 +2296,7 @@ const UI_TEXT = {
     moreWaiting: "más esperando cuando quieras.",
     nothingElseDue: "No hay nada más pendiente por ahora. Vuelve más tarde.",
     practiceComplete: "Práctica completa.",
-    allCategories: "Choose a category"
+    allCategories: "Elige una categoría"
   }
 };
 
@@ -2404,9 +2400,9 @@ function renderBilingualSettings() {
   const select = $("categorySelect");
   const opts = select.querySelectorAll("option");
   // Keep "All" option, remove any others that exist. Its label follows
-  // the interface language same as everything else on this screen —
-  // "Todas las categorías" in Spanish mode, an English prompt in
-  // English mode — even though the trade names listed below it don't.
+  // the interface language like everything else on this screen — English
+  // during Spanish-learning mode, Spanish during English-learning mode —
+  // even though the trade names listed below it don't.
   opts[0].textContent = T("allCategories");
   for (let i = opts.length - 1; i > 0; i--) {
     opts[i].remove();
