@@ -1937,7 +1937,12 @@ function pickVoices() {
   if (!esVoice) {
     esVoice = voices.filter(function (v) { return normLang(v.lang).indexOf("es") === 0; })[0] || null;
   }
-  enVoice = voices.filter(function (v) { return normLang(v.lang).indexOf("en-US") === 0; })[0]
+  // "Google US English" tested best of the voices available on this
+  // device (see voice-test.html) — prefer it by name, but fall back to
+  // any en-US voice, then any English voice, so playback never goes
+  // silent on a device that doesn't have the Google voice installed.
+  enVoice = voices.filter(function (v) { return normLang(v.lang) === "en-US" && v.name.indexOf("Google") !== -1; })[0]
+         || voices.filter(function (v) { return normLang(v.lang).indexOf("en-US") === 0; })[0]
          || voices.filter(function (v) { return normLang(v.lang).indexOf("en") === 0; })[0]
          || null;
 }
