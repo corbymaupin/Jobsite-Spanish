@@ -16,6 +16,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Jobsite">
 <meta name="description" content="Construction Spanish for supervisors running Texas crews.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-512.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 
 <style>
 /* ===================================================================
@@ -2905,41 +2908,24 @@ if (TTS) {
   });
 }
 
-/* A web app manifest is normally a second file, which would break the
-   one-file rule. Building it as a Blob at runtime keeps everything in
-   index.html and still satisfies the browser, because a blob: URL
-   counts as same-origin. This is what lets Android offer "Install
-   app" and gives the installed window its own name and colors. iOS
-   uses the apple-* meta tags in the head instead and needs no
-   manifest at all. */
-(function injectManifest() {
+/* Registers the offline shell cache (sw.js). Changes nothing about how
+   the app behaves - everything it needs already lives in this file and
+   in localStorage - it only lets the first request succeed without a
+   network, which matters once this is wrapped as an Android app via
+   Trusted Web Activity for the Play Store. manifest.json and sw.js are
+   real files rather than inlined here: a service worker cannot be
+   registered from a blob: URL at all, and Android's TWA tooling needs
+   to fetch manifest.json as a stable, independent URL - so this is the
+   one deliberate exception to the one-file rule, carrying no logic of
+   its own. Guarded the same way this used to guard the old blob-based
+   manifest injection: if registration fails (unsupported browser, the
+   file:// context the test suite loads under), the app runs exactly
+   the same either way. */
+if ("serviceWorker" in navigator) {
   try {
-    const icon =
-      "data:image/svg+xml," + encodeURIComponent(
-        '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">' +
-        '<rect width="512" height="512" rx="112" fill="#0E0F12"/>' +
-        '<rect x="96" y="96" width="320" height="320" rx="72" fill="#FF7A1A"/>' +
-        '<path d="M170 264l58 58 116-132" stroke="#24140A" stroke-width="34" ' +
-        'fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>');
-
-    const manifest = {
-      name: "Jobsite Spanish",
-      short_name: "Jobsite",
-      start_url: ".",
-      display: "standalone",
-      orientation: "portrait",
-      background_color: "#0E0F12",
-      theme_color: "#0E0F12",
-      icons: [{ src: icon, sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }]
-    };
-
-    const url = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" }));
-    const link = document.createElement("link");
-    link.rel = "manifest";
-    link.href = url;
-    document.head.appendChild(link);
+    navigator.serviceWorker.register("sw.js").catch(function () {});
   } catch (e) { /* installability is a bonus, never a requirement */ }
-})();
+}
 
 
 /* ===================================================================
