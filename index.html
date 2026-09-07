@@ -839,6 +839,19 @@ kbd {
         <div id="startArea"></div>
       </div>
 
+      <div class="panel" id="homeSettings">
+        <p class="panel-title">Learning mode</p>
+        <div style="display: flex; gap: 0.875rem; margin-bottom: 1rem; align-items: center;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; flex: 1;">
+            <input type="checkbox" id="bilingualToggle" style="width: 18px; height: 18px; cursor: pointer;">
+            <span id="bilingualLabel" style="color: var(--ink-2); font-size: 0.875rem;">Aprender Español</span>
+          </label>
+        </div>
+        <select id="categorySelect" style="width: 100%; padding: 0.625rem; background: var(--surface-2); color: var(--ink); border: 1px solid var(--line); border-radius: var(--r-sm); font-size: 0.875rem; cursor: pointer;">
+          <option value="All">Todas las categorías</option>
+        </select>
+      </div>
+
       <div class="panel" id="homeProgress" hidden>
         <p class="panel-title">Where your cards sit</p>
         <div class="gauge" id="homeGauge" style="height:3.75rem"></div>
@@ -1725,7 +1738,9 @@ function blankState() {
     progress: {},                          // cardKey -> { box, introduced, nextReview }
     streak: { last: "", days: 0 },
     listen: { order: "es-en", gap: 3000, repeat: false, scope: "learning" },
-    session: null                          // saved session deck — see section 8
+    session: null,                         // saved session deck — see section 8
+    bilingual: false,                      // true = learn English (ES→EN), false = learn Spanish (EN→ES)
+    categoryMode: "All"                    // "All" = normal mode, or a category name for pure practice
   };
 }
 
@@ -2059,6 +2074,18 @@ const GRADUATE_AT = 2;         // correct answers needed to graduate a new card
 // Build a fresh working set: due reviews plus enough new cards to hit
 // the target ratio, given how many reviews are available. If there
 // are no reviews at all, the whole set is new cards.
+// Pure practice mode: all cards from a category, shuffled, no Leitner logic
+function buildCategorySet(category) {
+  const cards = shuffle(deck.filter(function (c) { return c.trade === category; }).slice());
+  if (cards.length === 0) return null;
+  return {
+    trade: category,
+    keys: cards.map(function (c) { return c.key; }),
+    graduations: {},   // empty — category mode doesn't track graduation
+    isCategoryMode: true   // flag to signal this is pure practice, not Leitner
+  };
+}
+
 function buildWorkingSet(trade) {
   const due = shuffle(dueCards(trade).slice());
   const pool = shuffle(uninitiatedCards(trade).slice());
@@ -2086,7 +2113,8 @@ function buildWorkingSet(trade) {
   return {
     trade: trade,
     keys: cards.map(function (c) { return c.key; }),
-    graduations: graduations   // cardKey -> correct-answer count, new cards only
+    graduations: graduations,   // cardKey -> correct-answer count, new cards only
+    isCategoryMode: false
   };
 }
 
@@ -2132,6 +2160,8 @@ let activeTrade = "All";
 let browseTrade = "All";
 let listenTrade = "All";
 let activeTab = "study";
+let isBilingual = false;                   // true = learn English, false = learn Spanish
+let activeCategory = "All";                // "All" = normal Leitner, or a trade name = pure practice mode
 
 function shuffle(a) {
   // Fisher-Yates: walk backwards, swapping each item with a random
@@ -2218,34 +2248,109 @@ function renderTradeChips(containerId, selected, onPick, withCounts) {
   });
 }
 
+function renderBilingualSettings() {
+  // Populate category dropdown with all trades
+  const select = $("categorySelect");
+  const opts = select.querySelectorAll("option");
+  // Keep "All" option, remove any others that exist
+  for (let i = opts.length - 1; i > 0; i--) {
+    opts[i].remove();
+  }
+  // Add all trade options
+  TRADES.forEach(function (trade) {
+    const opt = document.createElement("option");
+    opt.value = trade;
+    opt.textContent = trade;
+    select.appendChild(opt);
+  });
+
+  // Set current values
+  const bilingual = $("bilingualToggle");
+  bilingual.checked = isBilingual;
+  bilingual.addEventListener("change", function () {
+    isBilingual = bilingual.checked;
+    state.bilingual = isBilingual;
+    save();
+    updateBilingualLabel();
+    // If in category mode, category mode continues. If not, nothing changes for display.
+  });
+
+  select.value = activeCategory;
+  select.addEventListener("change", function () {
+    activeCategory = select.value;
+    state.categoryMode = activeCategory;
+    save();
+    renderStudyHome();  // Refresh to show/hide progress gauge
+  });
+
+  updateBilingualLabel();
+}
+
+function updateBilingualLabel() {
+  const label = $("bilingualLabel");
+  label.textContent = isBilingual ? "Aprender Inglés" : "Aprender Español";
+}
+
 function renderStudyHome() {
-  const due = dueCards(activeTrade);
-  const fresh = uninitiatedCards(activeTrade);
-
-  $("kDue").textContent = due.length;
-  $("kNew").textContent = fresh.length;
-  $("kKnown").textContent = masteredCount();
-  renderStreakChip();
-
-  const hasResumable = state.session && state.session.trade === activeTrade && state.session.keys.length > 0;
-  const total = due.length + fresh.length;
   const area = $("startArea");
 
-  if (hasResumable) {
-    const remaining = state.session.keys.length;
-    area.innerHTML = '<button class="btn btn-primary" id="startBtn">Continue · ' + remaining + ' card' + (remaining === 1 ? '' : 's') + '</button>';
-    $("startBtn").addEventListener("click", startSession);
-  } else if (total > 0) {
-    area.innerHTML = '<button class="btn btn-primary" id="startBtn">Start · ' + total + ' card' + (total === 1 ? '' : 's') + '</button>';
-    $("startBtn").addEventListener("click", startSession);
+  // In category mode, show the category's cards. Otherwise use Leitner logic.
+  if (activeCategory !== "All") {
+    const categoryCards = deck.filter(function (c) { return c.trade === activeCategory; });
+    const total = categoryCards.length;
+
+    $("kDue").textContent = total;
+    $("kNew").textContent = "0";
+    $("kKnown").textContent = "0";
+    renderStreakChip();
+
+    if (total > 0) {
+      area.innerHTML = '<button class="btn btn-primary" id="startBtn">Start · ' + total + ' card' + (total === 1 ? '' : 's') + '</button>';
+      $("startBtn").addEventListener("click", startSession);
+    } else {
+      area.innerHTML =
+        '<div class="empty">' +
+          '<svg class="empty-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg>' +
+          "<h3>No cards in " + activeCategory + "</h3>" +
+          "<p>This category has no cards. Try selecting another one.</p>" +
+        "</div>";
+    }
+    // Hide progress gauge in category mode
+    $("homeProgress").hidden = true;
   } else {
-    area.innerHTML =
-      '<div class="empty">' +
-        '<svg class="empty-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg>' +
-        "<h3>Nothing due" + (activeTrade === "All" ? "" : " in " + activeTrade) + "</h3>" +
-        "<p>Everything here is scheduled out, or the whole trade is mastered. " +
-        "Boxes 4 and 5 take 8 and 16 days to come back around.</p>" +
-      "</div>";
+    // Normal Leitner mode
+    const due = dueCards(activeTrade);
+    const fresh = uninitiatedCards(activeTrade);
+
+    $("kDue").textContent = due.length;
+    $("kNew").textContent = fresh.length;
+    $("kKnown").textContent = masteredCount();
+    renderStreakChip();
+
+    const hasResumable = state.session && state.session.trade === activeTrade && state.session.keys.length > 0;
+    const total = due.length + fresh.length;
+
+    if (hasResumable) {
+      const remaining = state.session.keys.length;
+      area.innerHTML = '<button class="btn btn-primary" id="startBtn">Continue · ' + remaining + ' card' + (remaining === 1 ? '' : 's') + '</button>';
+      $("startBtn").addEventListener("click", startSession);
+    } else if (total > 0) {
+      area.innerHTML = '<button class="btn btn-primary" id="startBtn">Start · ' + total + ' card' + (total === 1 ? '' : 's') + '</button>';
+      $("startBtn").addEventListener("click", startSession);
+    } else {
+      area.innerHTML =
+        '<div class="empty">' +
+          '<svg class="empty-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg>' +
+          "<h3>Nothing due" + (activeTrade === "All" ? "" : " in " + activeTrade) + "</h3>" +
+          "<p>Everything here is scheduled out, or the whole trade is mastered. " +
+          "Boxes 4 and 5 take 8 and 16 days to come back around.</p>" +
+        "</div>";
+    }
+
+    // Show progress gauge if started in normal mode
+    const started = introducedCount() > 0;
+    $("homeProgress").hidden = !started;
+    if (started) drawGauge("homeGauge");
   }
 
   renderTradeChips("tradeChips", activeTrade, function (t) {
@@ -2258,12 +2363,8 @@ function renderStudyHome() {
     ? "Numbers are reviews owed. New words rotate in continuously during a session as you learn them."
     : "No reviews owed yet. New words rotate in continuously as you get them right twice.";
 
-  // The box strip only appears once there's something in it. An empty
-  // chart on day one is worse than no chart — it reads as broken
-  // rather than as new.
-  const started = introducedCount() > 0;
-  $("homeProgress").hidden = !started;
-  if (started) drawGauge("homeGauge");
+  // Render bilingual toggle and category dropdown
+  renderBilingualSettings();
 
   setStudyView("home");
 }
@@ -2279,15 +2380,28 @@ function hydrateQueue(sess) {
 }
 
 function startSession() {
-  const hasResumable = state.session && state.session.trade === activeTrade && state.session.keys.length > 0;
-  session = hasResumable ? state.session : buildWorkingSet(activeTrade);
+  // In category mode, build a pure practice set. Otherwise use normal Leitner logic.
+  if (activeCategory !== "All") {
+    session = buildCategorySet(activeCategory);
+    if (!session) {
+      // Category has no cards
+      renderStudyHome();
+      return;
+    }
+  } else {
+    const hasResumable = state.session && state.session.trade === activeTrade && state.session.keys.length > 0;
+    session = hasResumable ? state.session : buildWorkingSet(activeTrade);
+  }
 
   queue = hydrateQueue(session);
   sessionRight = 0;
   sessionWrong = 0;
   retried = [];
 
-  saveSession(session);
+  // Don't save category mode sessions — they're pure practice
+  if (!session.isCategoryMode) {
+    saveSession(session);
+  }
   setStudyView("session");
   nextCard();
 }
@@ -2305,8 +2419,17 @@ function nextCard() {
   // giving the instruction.
   direction = Math.random() < 0.5 ? "en-es" : "es-en";
 
-  const promptText = direction === "en-es" ? current.en : current.es;
-  const answerText = direction === "en-es" ? current.es : current.en;
+  // In bilingual mode (learning English), swap the direction
+  let promptText, answerText;
+  if (isBilingual) {
+    // Learn English: Spanish prompt → English answer
+    promptText = direction === "en-es" ? current.es : current.en;
+    answerText = direction === "en-es" ? current.en : current.es;
+  } else {
+    // Learn Spanish (default): English prompt → Spanish answer
+    promptText = direction === "en-es" ? current.en : current.es;
+    answerText = direction === "en-es" ? current.es : current.en;
+  }
 
   $("promptText").textContent = promptText;
   $("answerText").textContent = answerText;
@@ -2328,15 +2451,36 @@ function nextCard() {
   $("verdictRow").hidden = true;
   $("flipBtn").hidden = false;
 
-  // The speak button follows the Spanish, whichever side it's on. Both
-  // are decided here, up front, rather than at flip() time — the
-  // answer-block already reserves its full height before the answer is
-  // revealed (see the CSS comment on .answer-block), and toggling
-  // answerSpeak's `hidden` mid-flip would silently add a whole button
-  // into that reserved height right as the user reveals it, shifting
-  // the split line at the exact moment it must not move.
-  $("promptSpeak").hidden = (direction !== "es-en" || !TTS);
-  $("answerSpeak").hidden = (direction !== "en-es" || !TTS);
+  // Determine what text to speak for each button based on bilingual mode
+  // In normal mode (learning Spanish), speak Spanish
+  // In bilingual mode (learning English), speak both Spanish and English
+  let promptSpeakText, answerSpeakText;
+  if (isBilingual) {
+    // Learning English: speak both languages on both sides
+    if (direction === "en-es") {
+      // Spanish prompt, English answer
+      promptSpeakText = current.es;
+      answerSpeakText = current.en;
+      $("promptSpeak").hidden = !TTS;
+      $("answerSpeak").hidden = !TTS;
+    } else {
+      // English prompt, Spanish answer
+      promptSpeakText = current.en;
+      answerSpeakText = current.es;
+      $("promptSpeak").hidden = !TTS;
+      $("answerSpeak").hidden = !TTS;
+    }
+  } else {
+    // Learning Spanish: only speak Spanish (on prompt when it's Spanish, on answer when it's Spanish)
+    promptSpeakText = current.es;
+    answerSpeakText = current.es;
+    $("promptSpeak").hidden = (direction !== "es-en" || !TTS);
+    $("answerSpeak").hidden = (direction !== "en-es" || !TTS);
+  }
+
+  // Store the text to speak for each button
+  $("promptSpeak").dataset.speakText = promptSpeakText;
+  $("answerSpeak").dataset.speakText = answerSpeakText;
 
   const done = sessionRight + sessionWrong;
   const shown = done + 1;
@@ -2351,10 +2495,14 @@ function flip() {
   $("flipBtn").hidden = true;
   $("verdictRow").hidden = false;
 
-  if (direction === "en-es" && TTS) {
+  if (TTS) {
     // Play once automatically. You've just committed to an answer,
     // which is the moment the correct sound actually sticks.
-    speak(current.es, { button: $("answerSpeak") });
+    // Speak the answer text in the appropriate language
+    const answerText = $("answerSpeak").dataset.speakText || current.es;
+    const opts = { button: $("answerSpeak") };
+    if (answerText === current.en) opts.lang = "en";
+    speak(answerText, opts);
   }
 }
 
@@ -2404,13 +2552,16 @@ function grade(right) {
     }
   }
 
-  commit(current);
-  // The queue is the single source of truth for what's left in this
-  // working set — whatever didn't get pushed back onto it (a
-  // correctly-answered review, a graduated new card) is meant to
-  // drop out of the persisted session too.
-  session.keys = queue.map(function (c) { return c.key; });
-  saveSession(session);
+  // In category mode (pure practice), don't save progress — just move on
+  if (!session.isCategoryMode) {
+    commit(current);
+    // The queue is the single source of truth for what's left in this
+    // working set — whatever didn't get pushed back onto it (a
+    // correctly-answered review, a graduated new card) is meant to
+    // drop out of the persisted session too.
+    session.keys = queue.map(function (c) { return c.key; });
+    saveSession(session);
+  }
   bumpStreak();
   nextCard();
 }
@@ -2851,8 +3002,18 @@ $("missedBtn").addEventListener("click", function () { grade(false); });
 $("endBtn").addEventListener("click", function () { finishSession(); });
 $("againBtn").addEventListener("click", startSession);
 $("doneBackBtn").addEventListener("click", renderStudyHome);
-$("promptSpeak").addEventListener("click", function () { speak(current.es, { button: $("promptSpeak") }); });
-$("answerSpeak").addEventListener("click", function () { speak(current.es, { button: $("answerSpeak") }); });
+$("promptSpeak").addEventListener("click", function () {
+  const text = $("promptSpeak").dataset.speakText || current.es;
+  const opts = { button: $("promptSpeak") };
+  if (text === current.en) opts.lang = "en";
+  speak(text, opts);
+});
+$("answerSpeak").addEventListener("click", function () {
+  const text = $("answerSpeak").dataset.speakText || current.es;
+  const opts = { button: $("answerSpeak") };
+  if (text === current.en) opts.lang = "en";
+  speak(text, opts);
+});
 
 $("playBtn").addEventListener("click", function () { listen.on ? stopListen() : startListen(); });
 $("prevBtn").addEventListener("click", function () { listenSkip(-1); });
@@ -2986,6 +3147,9 @@ window.jobsite = {
    =================================================================== */
 
 load();
+// Initialize bilingual and category mode from saved state
+isBilingual = state.bilingual || false;
+activeCategory = state.categoryMode || "All";
 goTab("study");
 </script>
 </body>
