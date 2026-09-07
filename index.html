@@ -2270,7 +2270,12 @@ const UI_TEXT = {
     noCardsReviewed: "No cards reviewed.",
     moreWaiting: "more waiting whenever you are.",
     nothingElseDue: "Nothing else due right now. Come back later.",
-    practiceComplete: "Practice complete."
+    practiceComplete: "Practice complete.",
+    // Deliberately the odd one out: every other key here is the English
+    // *interface* text shown during Spanish-learning mode. This one is
+    // the Spanish default-option text ("Todas las categorías") that was
+    // already correct before English mode existed, kept unchanged.
+    allCategories: "Todas las categorías"
   },
   es: {
     today: "Hoy", due: "Por revisar", new: "Nuevo", mastered: "Dominado",
@@ -2294,7 +2299,8 @@ const UI_TEXT = {
     noCardsReviewed: "No se repasó ninguna tarjeta.",
     moreWaiting: "más esperando cuando quieras.",
     nothingElseDue: "No hay nada más pendiente por ahora. Vuelve más tarde.",
-    practiceComplete: "Práctica completa."
+    practiceComplete: "Práctica completa.",
+    allCategories: "Choose a category"
   }
 };
 
@@ -2397,7 +2403,11 @@ function renderBilingualSettings() {
   // Populate category dropdown with all trades
   const select = $("categorySelect");
   const opts = select.querySelectorAll("option");
-  // Keep "All" option, remove any others that exist
+  // Keep "All" option, remove any others that exist. Its label follows
+  // the interface language same as everything else on this screen —
+  // "Todas las categorías" in Spanish mode, an English prompt in
+  // English mode — even though the trade names listed below it don't.
+  opts[0].textContent = T("allCategories");
   for (let i = opts.length - 1; i > 0; i--) {
     opts[i].remove();
   }
