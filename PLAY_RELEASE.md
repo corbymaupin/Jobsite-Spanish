@@ -5,11 +5,10 @@
 
 ## What the repo is today
 
-This repository is a **web-only PWA**: one large `index.html` (vanilla JS), plus `manifest.json` / `sw.js` / icons for installability. There is **no** Android/Kotlin/Flutter/React Native project here.
+Native Play code lives in **`android/`** — Kotlin + Jetpack Compose, package id `com.corbymaupin.jobsitespanish`. Open that folder in Android Studio (Sync → Run). See `android/README.md`.
 
-Corby’s requirement: ship on Google Play as a **standalone native Android app** — **not** HTML/CSS/JS inside a WebView, and **not** Capacitor / Cordova / PhoneGap / Trusted Web Activity / PWABuilder wrap of the website.
+The repo root remains the **web PWA** (`index.html`, `manifest.json`, `sw.js`, icons) as behavior/content reference and demo. **TWA / Capacitor / Cordova / WebView wraps stay retired** — Play ships from the native Compose app only.
 
-The previous TWA/PWABuilder path in this doc is **retired**. Keep the web app as the **behavior/content reference** and as a possible marketing demo; Play ships from a new native codebase.
 
 ---
 
@@ -35,14 +34,16 @@ The web app’s hard parts are **data + rules**, not a huge UI surface. Those po
 5. **Replace `localStorage`** → DataStore or Room (progress + streak only; terms stay in assets).
 6. **Reuse store art** already in `store-assets/` and `icons/` (regenerate adaptive icon mipmaps from `icon-512.png`).
 
-Suggested new layout (either new repo `Jobsite-Spanish-Android` or `/android` app module — prefer **separate repo** so the web demo stays untouched):
+Layout (scaffolded under `android/`):
 
 ```
-app/
-  src/main/java/.../ui/   Study, Listen, Browse, Stats
-  src/main/java/.../data/ TermsRepository, ProgressStore
-  src/main/java/.../srs/  Leitner + session builder
-  src/main/assets/terms.json
+android/
+  app/src/main/java/com/corbymaupin/jobsitespanish/
+    ui/   Study, Listen, Browse, Stats
+    data/ TermsRepository, ProgressStore
+    srs/  Leitner + session builder
+    tts/  Speech (TextToSpeech)
+  app/src/main/assets/terms.json
 ```
 
 **Application id:** `com.corbymaupin.jobsitespanish`  
@@ -53,14 +54,14 @@ app/
 
 ## Feature parity checklist (from web → native)
 
-- [ ] 387 cards / 13 trades loaded from assets
-- [ ] Study: flip card, correct/incorrect, Leitner scheduling
-- [ ] Session new-card rotation (~30/70 vs reviews; graduate after 2 correct)
-- [ ] Category / trade practice mode
-- [ ] Listen mode (hands-free queue, does not move Leitner boxes)
-- [ ] Browse deck by trade
-- [ ] Stats: streak, totals, box gauge
-- [ ] Offline-only runtime (no network required after install)
+- [x] 387 cards / 13 trades loaded from assets
+- [x] Study: flip card, correct/incorrect, Leitner scheduling (scaffold)
+- [x] Session new-card rotation (~30/70 vs reviews; graduate after 2 correct) (scaffold)
+- [x] Category / trade practice mode (scaffold)
+- [x] Listen mode (hands-free queue, does not move Leitner boxes) (basic)
+- [x] Browse deck by trade
+- [x] Stats: streak, totals, box gauge
+- [x] Offline-only runtime (no network required after install)
 - [ ] Bilingual study-home toggle (if keeping web parity)
 - [ ] Privacy policy URL (can keep hosted `privacy.html`; update wording from “browser localStorage” → “on-device app storage”)
 

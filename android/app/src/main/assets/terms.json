@@ -1,0 +1,2711 @@
+[
+  {
+    "id": "concrete|el concreto",
+    "en": "concrete",
+    "es": "el concreto",
+    "trade": "Concrete",
+    "region": "Spain: el hormigón"
+  },
+  {
+    "id": "cement|el cemento",
+    "en": "cement",
+    "es": "el cemento",
+    "trade": "Concrete",
+    "region": ""
+  },
+  {
+    "id": "rebar|la varilla",
+    "en": "rebar",
+    "es": "la varilla",
+    "trade": "Concrete",
+    "region": "Formal: varilla corrugada"
+  },
+  {
+    "id": "formwork|la cimbra",
+    "en": "formwork",
+    "es": "la cimbra",
+    "trade": "Concrete",
+    "region": "S. America: el encofrado"
+  },
+  {
+    "id": "concrete slab|la losa",
+    "en": "concrete slab",
+    "es": "la losa",
+    "trade": "Concrete",
+    "region": ""
+  },
+  {
+    "id": "the pour|el colado",
+    "en": "the pour",
+    "es": "el colado",
+    "trade": "Concrete",
+    "region": "Also: el vaciado"
+  },
+  {
+    "id": "curing|el curado",
+    "en": "curing",
+    "es": "el curado",
+    "trade": "Concrete",
+    "region": ""
+  },
+  {
+    "id": "slump|el revenimiento",
+    "en": "slump",
+    "es": "el revenimiento",
+    "trade": "Concrete",
+    "region": ""
+  },
+  {
+    "id": "footing|la zapata",
+    "en": "footing",
+    "es": "la zapata",
+    "trade": "Concrete",
+    "region": ""
+  },
+  {
+    "id": "gravel|la grava",
+    "en": "gravel",
+    "es": "la grava",
+    "trade": "Concrete",
+    "region": ""
+  },
+  {
+    "id": "sand|la arena",
+    "en": "sand",
+    "es": "la arena",
+    "trade": "Concrete",
+    "region": ""
+  },
+  {
+    "id": "aggregate|el agregado",
+    "en": "aggregate",
+    "es": "el agregado",
+    "trade": "Concrete",
+    "region": ""
+  },
+  {
+    "id": "concrete mixer|la revolvedora",
+    "en": "concrete mixer",
+    "es": "la revolvedora",
+    "trade": "Concrete",
+    "region": "Also: la mezcladora"
+  },
+  {
+    "id": "mixer truck|el camión revolvedor",
+    "en": "mixer truck",
+    "es": "el camión revolvedor",
+    "trade": "Concrete",
+    "region": "Mexico, slang: la olla"
+  },
+  {
+    "id": "concrete vibrator|el vibrador",
+    "en": "concrete vibrator",
+    "es": "el vibrador",
+    "trade": "Concrete",
+    "region": ""
+  },
+  {
+    "id": "screed|la regla",
+    "en": "screed",
+    "es": "la regla",
+    "trade": "Concrete",
+    "region": ""
+  },
+  {
+    "id": "trowel|la llana",
+    "en": "trowel",
+    "es": "la llana",
+    "trade": "Concrete",
+    "region": "Also: la cuchara"
+  },
+  {
+    "id": "broom finish|el acabado escobillado",
+    "en": "broom finish",
+    "es": "el acabado escobillado",
+    "trade": "Concrete",
+    "region": ""
+  },
+  {
+    "id": "control joint|la junta de control",
+    "en": "control joint",
+    "es": "la junta de control",
+    "trade": "Concrete",
+    "region": ""
+  },
+  {
+    "id": "anchor bolt|el perno de anclaje",
+    "en": "anchor bolt",
+    "es": "el perno de anclaje",
+    "trade": "Concrete",
+    "region": "Also: el ancla"
+  },
+  {
+    "id": "wire mesh|la malla electrosoldada",
+    "en": "wire mesh",
+    "es": "la malla electrosoldada",
+    "trade": "Concrete",
+    "region": ""
+  },
+  {
+    "id": "tie wire|el alambre recocido",
+    "en": "tie wire",
+    "es": "el alambre recocido",
+    "trade": "Concrete",
+    "region": ""
+  },
+  {
+    "id": "column|la columna",
+    "en": "column",
+    "es": "la columna",
+    "trade": "Concrete",
+    "region": ""
+  },
+  {
+    "id": "beam|la viga",
+    "en": "beam",
+    "es": "la viga",
+    "trade": "Concrete",
+    "region": "Mexico: la trabe"
+  },
+  {
+    "id": "mortar|la mezcla",
+    "en": "mortar",
+    "es": "la mezcla",
+    "trade": "Concrete",
+    "region": "Formal: el mortero"
+  },
+  {
+    "id": "concrete block|el bloque",
+    "en": "concrete block",
+    "es": "el bloque",
+    "trade": "Concrete",
+    "region": "Mexico: el block"
+  },
+  {
+    "id": "stud|el poste",
+    "en": "stud",
+    "es": "el poste",
+    "trade": "Framing",
+    "region": "Also: el montante"
+  },
+  {
+    "id": "joist|la vigueta",
+    "en": "joist",
+    "es": "la vigueta",
+    "trade": "Framing",
+    "region": ""
+  },
+  {
+    "id": "rafter|el par",
+    "en": "rafter",
+    "es": "el par",
+    "trade": "Framing",
+    "region": "Also: la viga de techo"
+  },
+  {
+    "id": "header|el cabezal",
+    "en": "header",
+    "es": "el cabezal",
+    "trade": "Framing",
+    "region": "Also: el dintel"
+  },
+  {
+    "id": "sheathing|el forro",
+    "en": "sheathing",
+    "es": "el forro",
+    "trade": "Framing",
+    "region": "Also: el entablado"
+  },
+  {
+    "id": "top plate|la solera superior",
+    "en": "top plate",
+    "es": "la solera superior",
+    "trade": "Framing",
+    "region": ""
+  },
+  {
+    "id": "bottom plate|la solera inferior",
+    "en": "bottom plate",
+    "es": "la solera inferior",
+    "trade": "Framing",
+    "region": ""
+  },
+  {
+    "id": "blocking|el bloqueo",
+    "en": "blocking",
+    "es": "el bloqueo",
+    "trade": "Framing",
+    "region": "Also: los travesaños"
+  },
+  {
+    "id": "truss|la armadura",
+    "en": "truss",
+    "es": "la armadura",
+    "trade": "Framing",
+    "region": "Also: la cercha"
+  },
+  {
+    "id": "lumber|la madera",
+    "en": "lumber",
+    "es": "la madera",
+    "trade": "Framing",
+    "region": ""
+  },
+  {
+    "id": "two-by-four|el dos por cuatro",
+    "en": "two-by-four",
+    "es": "el dos por cuatro",
+    "trade": "Framing",
+    "region": ""
+  },
+  {
+    "id": "plywood|la madera contrachapada",
+    "en": "plywood",
+    "es": "la madera contrachapada",
+    "trade": "Framing",
+    "region": "Mexico: el triplay"
+  },
+  {
+    "id": "stud spacing|la separación de postes",
+    "en": "stud spacing",
+    "es": "la separación de postes",
+    "trade": "Framing",
+    "region": ""
+  },
+  {
+    "id": "on center|a ejes",
+    "en": "on center",
+    "es": "a ejes",
+    "trade": "Framing",
+    "region": "Also: a centros"
+  },
+  {
+    "id": "plumb|a plomo",
+    "en": "plumb",
+    "es": "a plomo",
+    "trade": "Framing",
+    "region": ""
+  },
+  {
+    "id": "level (aligned)|a nivel",
+    "en": "level (aligned)",
+    "es": "a nivel",
+    "trade": "Framing",
+    "region": ""
+  },
+  {
+    "id": "square (aligned)|a escuadra",
+    "en": "square (aligned)",
+    "es": "a escuadra",
+    "trade": "Framing",
+    "region": ""
+  },
+  {
+    "id": "brace|el puntal",
+    "en": "brace",
+    "es": "el puntal",
+    "trade": "Framing",
+    "region": ""
+  },
+  {
+    "id": "shim|la cuña",
+    "en": "shim",
+    "es": "la cuña",
+    "trade": "Framing",
+    "region": ""
+  },
+  {
+    "id": "nail|el clavo",
+    "en": "nail",
+    "es": "el clavo",
+    "trade": "Framing",
+    "region": ""
+  },
+  {
+    "id": "screw|el tornillo",
+    "en": "screw",
+    "es": "el tornillo",
+    "trade": "Framing",
+    "region": ""
+  },
+  {
+    "id": "the framing|la estructura",
+    "en": "the framing",
+    "es": "la estructura",
+    "trade": "Framing",
+    "region": ""
+  },
+  {
+    "id": "wall|el muro",
+    "en": "wall",
+    "es": "el muro",
+    "trade": "Framing",
+    "region": "Also: la pared"
+  },
+  {
+    "id": "ceiling|el techo",
+    "en": "ceiling",
+    "es": "el techo",
+    "trade": "Framing",
+    "region": "Suspended: el plafón"
+  },
+  {
+    "id": "floor|el piso",
+    "en": "floor",
+    "es": "el piso",
+    "trade": "Framing",
+    "region": ""
+  },
+  {
+    "id": "stairs|la escalera",
+    "en": "stairs",
+    "es": "la escalera",
+    "trade": "Framing",
+    "region": ""
+  },
+  {
+    "id": "conduit|el conducto",
+    "en": "conduit",
+    "es": "el conducto",
+    "trade": "MEP",
+    "region": "Also: la tubería eléctrica"
+  },
+  {
+    "id": "breaker panel|el tablero eléctrico",
+    "en": "breaker panel",
+    "es": "el tablero eléctrico",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "ductwork|los ductos",
+    "en": "ductwork",
+    "es": "los ductos",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "water heater|el calentador de agua",
+    "en": "water heater",
+    "es": "el calentador de agua",
+    "trade": "MEP",
+    "region": "Mexico: el bóiler"
+  },
+  {
+    "id": "drain pipe|el tubo de desagüe",
+    "en": "drain pipe",
+    "es": "el tubo de desagüe",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "wiring|el cableado",
+    "en": "wiring",
+    "es": "el cableado",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "valve|la válvula",
+    "en": "valve",
+    "es": "la válvula",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "circuit breaker|el interruptor",
+    "en": "circuit breaker",
+    "es": "el interruptor",
+    "trade": "MEP",
+    "region": "Mexico: el breaker"
+  },
+  {
+    "id": "electrical outlet|el contacto",
+    "en": "electrical outlet",
+    "es": "el contacto",
+    "trade": "MEP",
+    "region": "Also: el enchufe"
+  },
+  {
+    "id": "light switch|el apagador",
+    "en": "light switch",
+    "es": "el apagador",
+    "trade": "MEP",
+    "region": "Also: el interruptor"
+  },
+  {
+    "id": "light fixture|la luminaria",
+    "en": "light fixture",
+    "es": "la luminaria",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "junction box|la caja de conexiones",
+    "en": "junction box",
+    "es": "la caja de conexiones",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "ground (electrical)|la tierra",
+    "en": "ground (electrical)",
+    "es": "la tierra",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "voltage|el voltaje",
+    "en": "voltage",
+    "es": "el voltaje",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "extension cord|la extensión",
+    "en": "extension cord",
+    "es": "la extensión",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "pipe|el tubo",
+    "en": "pipe",
+    "es": "el tubo",
+    "trade": "MEP",
+    "region": "Also: la tubería"
+  },
+  {
+    "id": "fitting|la conexión",
+    "en": "fitting",
+    "es": "la conexión",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "elbow|el codo",
+    "en": "elbow",
+    "es": "el codo",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "coupling|el cople",
+    "en": "coupling",
+    "es": "el cople",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "copper pipe|el tubo de cobre",
+    "en": "copper pipe",
+    "es": "el tubo de cobre",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "weld / solder|la soldadura",
+    "en": "weld / solder",
+    "es": "la soldadura",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "leak|la fuga",
+    "en": "leak",
+    "es": "la fuga",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "water supply|la toma de agua",
+    "en": "water supply",
+    "es": "la toma de agua",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "sewer|el drenaje",
+    "en": "sewer",
+    "es": "el drenaje",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "air conditioning|el aire acondicionado",
+    "en": "air conditioning",
+    "es": "el aire acondicionado",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "thermostat|el termostato",
+    "en": "thermostat",
+    "es": "el termostato",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "vent|la ventila",
+    "en": "vent",
+    "es": "la ventila",
+    "trade": "MEP",
+    "region": "Also: el respiradero"
+  },
+  {
+    "id": "insulated wire|el cable forrado",
+    "en": "insulated wire",
+    "es": "el cable forrado",
+    "trade": "MEP",
+    "region": ""
+  },
+  {
+    "id": "excavation|la excavación",
+    "en": "excavation",
+    "es": "la excavación",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "backfill|el relleno",
+    "en": "backfill",
+    "es": "el relleno",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "compaction|la compactación",
+    "en": "compaction",
+    "es": "la compactación",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "grading|la nivelación",
+    "en": "grading",
+    "es": "la nivelación",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "trench|la zanja",
+    "en": "trench",
+    "es": "la zanja",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "shoring|el apuntalamiento",
+    "en": "shoring",
+    "es": "el apuntalamiento",
+    "trade": "Site work",
+    "region": "Also: la entibación"
+  },
+  {
+    "id": "survey stake|la estaca",
+    "en": "survey stake",
+    "es": "la estaca",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "dirt / soil|la tierra",
+    "en": "dirt / soil",
+    "es": "la tierra",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "mud|el lodo",
+    "en": "mud",
+    "es": "el lodo",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "dust|el polvo",
+    "en": "dust",
+    "es": "el polvo",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "excavator|la excavadora",
+    "en": "excavator",
+    "es": "la excavadora",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "backhoe|la retroexcavadora",
+    "en": "backhoe",
+    "es": "la retroexcavadora",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "skid steer|el minicargador",
+    "en": "skid steer",
+    "es": "el minicargador",
+    "trade": "Site work",
+    "region": "Mexico: el bobcat"
+  },
+  {
+    "id": "dump truck|el camión de volteo",
+    "en": "dump truck",
+    "es": "el camión de volteo",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "plate compactor|la compactadora",
+    "en": "plate compactor",
+    "es": "la compactadora",
+    "trade": "Site work",
+    "region": "Jumping jack: el bailarín"
+  },
+  {
+    "id": "silt fence|la barrera de sedimento",
+    "en": "silt fence",
+    "es": "la barrera de sedimento",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "topsoil|la capa vegetal",
+    "en": "topsoil",
+    "es": "la capa vegetal",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "slope|el talud",
+    "en": "slope",
+    "es": "el talud",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "layout|el trazo",
+    "en": "layout",
+    "es": "el trazo",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "string line|el hilo",
+    "en": "string line",
+    "es": "el hilo",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "elevation|el nivel",
+    "en": "elevation",
+    "es": "el nivel",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "fill dirt|el material de relleno",
+    "en": "fill dirt",
+    "es": "el material de relleno",
+    "trade": "Site work",
+    "region": ""
+  },
+  {
+    "id": "tape measure|la cinta métrica",
+    "en": "tape measure",
+    "es": "la cinta métrica",
+    "trade": "Tools",
+    "region": "Mexico: el flexómetro"
+  },
+  {
+    "id": "level (tool)|el nivel",
+    "en": "level (tool)",
+    "es": "el nivel",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "hammer|el martillo",
+    "en": "hammer",
+    "es": "el martillo",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "drill|el taladro",
+    "en": "drill",
+    "es": "el taladro",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "saw|la sierra",
+    "en": "saw",
+    "es": "la sierra",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "circular saw|la sierra circular",
+    "en": "circular saw",
+    "es": "la sierra circular",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "reciprocating saw|el sable",
+    "en": "reciprocating saw",
+    "es": "el sable",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "grinder|la pulidora",
+    "en": "grinder",
+    "es": "la pulidora",
+    "trade": "Tools",
+    "region": "Also: el esmeril"
+  },
+  {
+    "id": "wheelbarrow|la carretilla",
+    "en": "wheelbarrow",
+    "es": "la carretilla",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "shovel|la pala",
+    "en": "shovel",
+    "es": "la pala",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "pick|el pico",
+    "en": "pick",
+    "es": "el pico",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "rake|el rastrillo",
+    "en": "rake",
+    "es": "el rastrillo",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "broom|la escoba",
+    "en": "broom",
+    "es": "la escoba",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "bucket|la cubeta",
+    "en": "bucket",
+    "es": "la cubeta",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "ladder|la escalera",
+    "en": "ladder",
+    "es": "la escalera",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "scaffold|el andamio",
+    "en": "scaffold",
+    "es": "el andamio",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "screwdriver|el desarmador",
+    "en": "screwdriver",
+    "es": "el desarmador",
+    "trade": "Tools",
+    "region": "Also: el destornillador"
+  },
+  {
+    "id": "pliers|las pinzas",
+    "en": "pliers",
+    "es": "las pinzas",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "wrench|la llave",
+    "en": "wrench",
+    "es": "la llave",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "chalk line|el hilo de gis",
+    "en": "chalk line",
+    "es": "el hilo de gis",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "utility knife|la navaja",
+    "en": "utility knife",
+    "es": "la navaja",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "nail gun|la clavadora",
+    "en": "nail gun",
+    "es": "la clavadora",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "impact driver|el impacto",
+    "en": "impact driver",
+    "es": "el impacto",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "generator|la planta de luz",
+    "en": "generator",
+    "es": "la planta de luz",
+    "trade": "Tools",
+    "region": "Also: el generador"
+  },
+  {
+    "id": "chainsaw|la motosierra",
+    "en": "chainsaw",
+    "es": "la motosierra",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "sledgehammer|el marro",
+    "en": "sledgehammer",
+    "es": "el marro",
+    "trade": "Tools",
+    "region": ""
+  },
+  {
+    "id": "drywall|el panel de yeso",
+    "en": "drywall",
+    "es": "el panel de yeso",
+    "trade": "Finishes",
+    "region": "Mexico: el tablaroca"
+  },
+  {
+    "id": "insulation|el aislamiento",
+    "en": "insulation",
+    "es": "el aislamiento",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "joint compound|la pasta",
+    "en": "joint compound",
+    "es": "la pasta",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "drywall tape|la cinta",
+    "en": "drywall tape",
+    "es": "la cinta",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "paint|la pintura",
+    "en": "paint",
+    "es": "la pintura",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "primer|el primario",
+    "en": "primer",
+    "es": "el primario",
+    "trade": "Finishes",
+    "region": "Also: la primera mano"
+  },
+  {
+    "id": "caulk|el silicón",
+    "en": "caulk",
+    "es": "el silicón",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "wall tile|el azulejo",
+    "en": "wall tile",
+    "es": "el azulejo",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "floor tile|la loseta",
+    "en": "floor tile",
+    "es": "la loseta",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "grout|la lechada",
+    "en": "grout",
+    "es": "la lechada",
+    "trade": "Finishes",
+    "region": "Mexico: la boquilla"
+  },
+  {
+    "id": "brick|el ladrillo",
+    "en": "brick",
+    "es": "el ladrillo",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "stucco|el aplanado",
+    "en": "stucco",
+    "es": "el aplanado",
+    "trade": "Finishes",
+    "region": "Also: el estuco"
+  },
+  {
+    "id": "roofing|el techado",
+    "en": "roofing",
+    "es": "el techado",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "shingle|la teja",
+    "en": "shingle",
+    "es": "la teja",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "flashing|el tapajuntas",
+    "en": "flashing",
+    "es": "el tapajuntas",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "gutter|la canaleta",
+    "en": "gutter",
+    "es": "la canaleta",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "window|la ventana",
+    "en": "window",
+    "es": "la ventana",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "door|la puerta",
+    "en": "door",
+    "es": "la puerta",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "door frame|el marco",
+    "en": "door frame",
+    "es": "el marco",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "baseboard|el rodapié",
+    "en": "baseboard",
+    "es": "el rodapié",
+    "trade": "Finishes",
+    "region": "Mexico: el zoclo"
+  },
+  {
+    "id": "adhesive|el pegamento",
+    "en": "adhesive",
+    "es": "el pegamento",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "sealant|el sellador",
+    "en": "sealant",
+    "es": "el sellador",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "plastic sheeting|el plástico",
+    "en": "plastic sheeting",
+    "es": "el plástico",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "insulation batt|el rollo de aislante",
+    "en": "insulation batt",
+    "es": "el rollo de aislante",
+    "trade": "Finishes",
+    "region": ""
+  },
+  {
+    "id": "safety|la seguridad",
+    "en": "safety",
+    "es": "la seguridad",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "hard hat|el casco",
+    "en": "hard hat",
+    "es": "el casco",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "safety glasses|los lentes de seguridad",
+    "en": "safety glasses",
+    "es": "los lentes de seguridad",
+    "trade": "Safety",
+    "region": "Also: las gafas"
+  },
+  {
+    "id": "gloves|los guantes",
+    "en": "gloves",
+    "es": "los guantes",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "safety harness|el arnés de seguridad",
+    "en": "safety harness",
+    "es": "el arnés de seguridad",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "safety vest|el chaleco",
+    "en": "safety vest",
+    "es": "el chaleco",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "steel-toe boots|las botas con casquillo",
+    "en": "steel-toe boots",
+    "es": "las botas con casquillo",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "ear plugs|los tapones",
+    "en": "ear plugs",
+    "es": "los tapones",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "dust mask|el cubrebocas",
+    "en": "dust mask",
+    "es": "el cubrebocas",
+    "trade": "Safety",
+    "region": "Also: la mascarilla"
+  },
+  {
+    "id": "fall protection|la protección contra caídas",
+    "en": "fall protection",
+    "es": "la protección contra caídas",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "lanyard|la línea de vida",
+    "en": "lanyard",
+    "es": "la línea de vida",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "guardrail|el barandal",
+    "en": "guardrail",
+    "es": "el barandal",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "first aid|los primeros auxilios",
+    "en": "first aid",
+    "es": "los primeros auxilios",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "accident|el accidente",
+    "en": "accident",
+    "es": "el accidente",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "injury|la lesión",
+    "en": "injury",
+    "es": "la lesión",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "emergency|la emergencia",
+    "en": "emergency",
+    "es": "la emergencia",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "fire extinguisher|el extintor",
+    "en": "fire extinguisher",
+    "es": "el extintor",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "danger|el peligro",
+    "en": "danger",
+    "es": "el peligro",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "caution tape|la cinta de precaución",
+    "en": "caution tape",
+    "es": "la cinta de precaución",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "confined space|el espacio confinado",
+    "en": "confined space",
+    "es": "el espacio confinado",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "lockout tagout|el bloqueo y etiquetado",
+    "en": "lockout tagout",
+    "es": "el bloqueo y etiquetado",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "toolbox talk|la charla de seguridad",
+    "en": "toolbox talk",
+    "es": "la charla de seguridad",
+    "trade": "Safety",
+    "region": ""
+  },
+  {
+    "id": "drawings|los planos",
+    "en": "drawings",
+    "es": "los planos",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "crew|la cuadrilla",
+    "en": "crew",
+    "es": "la cuadrilla",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "foreman|el capataz",
+    "en": "foreman",
+    "es": "el capataz",
+    "trade": "Office",
+    "region": "Mexico: el mayordomo"
+  },
+  {
+    "id": "superintendent|el superintendente",
+    "en": "superintendent",
+    "es": "el superintendente",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "subcontractor|el subcontratista",
+    "en": "subcontractor",
+    "es": "el subcontratista",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "general contractor|el contratista general",
+    "en": "general contractor",
+    "es": "el contratista general",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "owner|el dueño",
+    "en": "owner",
+    "es": "el dueño",
+    "trade": "Office",
+    "region": "Formal: el propietario"
+  },
+  {
+    "id": "architect|el arquitecto",
+    "en": "architect",
+    "es": "el arquitecto",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "engineer|el ingeniero",
+    "en": "engineer",
+    "es": "el ingeniero",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "inspector|el inspector",
+    "en": "inspector",
+    "es": "el inspector",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "laborer|el peón",
+    "en": "laborer",
+    "es": "el peón",
+    "trade": "Office",
+    "region": "Also: el ayudante"
+  },
+  {
+    "id": "equipment operator|el operador",
+    "en": "equipment operator",
+    "es": "el operador",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "punch list|la lista de pendientes",
+    "en": "punch list",
+    "es": "la lista de pendientes",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "schedule|el cronograma",
+    "en": "schedule",
+    "es": "el cronograma",
+    "trade": "Office",
+    "region": "Also: el programa de obra"
+  },
+  {
+    "id": "deadline|la fecha límite",
+    "en": "deadline",
+    "es": "la fecha límite",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "estimate|el presupuesto",
+    "en": "estimate",
+    "es": "el presupuesto",
+    "trade": "Office",
+    "region": "Also: la cotización"
+  },
+  {
+    "id": "change order|la orden de cambio",
+    "en": "change order",
+    "es": "la orden de cambio",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "invoice|la factura",
+    "en": "invoice",
+    "es": "la factura",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "inspection|la inspección",
+    "en": "inspection",
+    "es": "la inspección",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "permit|el permiso",
+    "en": "permit",
+    "es": "el permiso",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "measurement|la medida",
+    "en": "measurement",
+    "es": "la medida",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "the jobsite|la obra",
+    "en": "the jobsite",
+    "es": "la obra",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "delivery|la entrega",
+    "en": "delivery",
+    "es": "la entrega",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "shift|el turno",
+    "en": "shift",
+    "es": "el turno",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "break|el descanso",
+    "en": "break",
+    "es": "el descanso",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "overtime|el tiempo extra",
+    "en": "overtime",
+    "es": "el tiempo extra",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "payday|el día de pago",
+    "en": "payday",
+    "es": "el día de pago",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "material|el material",
+    "en": "material",
+    "es": "el material",
+    "trade": "Office",
+    "region": ""
+  },
+  {
+    "id": "inch|la pulgada",
+    "en": "inch",
+    "es": "la pulgada",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "foot (measure)|el pie",
+    "en": "foot (measure)",
+    "es": "el pie",
+    "trade": "Measurements",
+    "region": "Plural: los pies"
+  },
+  {
+    "id": "yard|la yarda",
+    "en": "yard",
+    "es": "la yarda",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "meter|el metro",
+    "en": "meter",
+    "es": "el metro",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "half an inch|media pulgada",
+    "en": "half an inch",
+    "es": "media pulgada",
+    "trade": "Measurements",
+    "region": "Not 'media de pulgada'"
+  },
+  {
+    "id": "a quarter inch|un cuarto de pulgada",
+    "en": "a quarter inch",
+    "es": "un cuarto de pulgada",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "three eighths|tres octavos",
+    "en": "three eighths",
+    "es": "tres octavos",
+    "trade": "Measurements",
+    "region": "Crews often say it in English"
+  },
+  {
+    "id": "three quarters|tres cuartos",
+    "en": "three quarters",
+    "es": "tres cuartos",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "a sixteenth|un dieciseisavo",
+    "en": "a sixteenth",
+    "es": "un dieciseisavo",
+    "trade": "Measurements",
+    "region": "Rare aloud; usually English"
+  },
+  {
+    "id": "length|el largo",
+    "en": "length",
+    "es": "el largo",
+    "trade": "Measurements",
+    "region": "Formal: la longitud"
+  },
+  {
+    "id": "width|el ancho",
+    "en": "width",
+    "es": "el ancho",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "height|la altura",
+    "en": "height",
+    "es": "la altura",
+    "trade": "Measurements",
+    "region": "Also: el alto"
+  },
+  {
+    "id": "depth|la profundidad",
+    "en": "depth",
+    "es": "la profundidad",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "thickness|el espesor",
+    "en": "thickness",
+    "es": "el espesor",
+    "trade": "Measurements",
+    "region": "Also: el grueso"
+  },
+  {
+    "id": "diameter|el diámetro",
+    "en": "diameter",
+    "es": "el diámetro",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "square feet|los pies cuadrados",
+    "en": "square feet",
+    "es": "los pies cuadrados",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "cubic yard|la yarda cúbica",
+    "en": "cubic yard",
+    "es": "la yarda cúbica",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "linear foot|el pie lineal",
+    "en": "linear foot",
+    "es": "el pie lineal",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "sixteen on center|a dieciséis a ejes",
+    "en": "sixteen on center",
+    "es": "a dieciséis a ejes",
+    "trade": "Measurements",
+    "region": "Also: a dieciséis a centros"
+  },
+  {
+    "id": "tolerance|la tolerancia",
+    "en": "tolerance",
+    "es": "la tolerancia",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "scale (on drawings)|la escala",
+    "en": "scale (on drawings)",
+    "es": "la escala",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "plus or minus|más o menos",
+    "en": "plus or minus",
+    "es": "más o menos",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "flush|al ras",
+    "en": "flush",
+    "es": "al ras",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "gap|la separación",
+    "en": "gap",
+    "es": "la separación",
+    "trade": "Measurements",
+    "region": "Also: el hueco"
+  },
+  {
+    "id": "slope / pitch|la pendiente",
+    "en": "slope / pitch",
+    "es": "la pendiente",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "degrees|los grados",
+    "en": "degrees",
+    "es": "los grados",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "weight|el peso",
+    "en": "weight",
+    "es": "el peso",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "pound|la libra",
+    "en": "pound",
+    "es": "la libra",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "How long is it?|¿Cuánto mide?",
+    "en": "How long is it?",
+    "es": "¿Cuánto mide?",
+    "trade": "Measurements",
+    "region": "Works for any dimension"
+  },
+  {
+    "id": "What are the dimensions?|¿Cuáles son las medidas?",
+    "en": "What are the dimensions?",
+    "es": "¿Cuáles son las medidas?",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "Measure it twice.|Mídalo dos veces.",
+    "en": "Measure it twice.",
+    "es": "Mídalo dos veces.",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "Cut it an inch shorter.|Córtelo una pulgada más corto.",
+    "en": "Cut it an inch shorter.",
+    "es": "Córtelo una pulgada más corto.",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "It's off by half an inch.|Está fuera por media pulgada.",
+    "en": "It's off by half an inch.",
+    "es": "Está fuera por media pulgada.",
+    "trade": "Measurements",
+    "region": "Short: le falta media pulgada"
+  },
+  {
+    "id": "It's too long.|Está muy largo.",
+    "en": "It's too long.",
+    "es": "Está muy largo.",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "It's too short.|Está muy corto.",
+    "en": "It's too short.",
+    "es": "Está muy corto.",
+    "trade": "Measurements",
+    "region": ""
+  },
+  {
+    "id": "crane|la grúa",
+    "en": "crane",
+    "es": "la grúa",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "tower crane|la grúa torre",
+    "en": "tower crane",
+    "es": "la grúa torre",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "forklift|el montacargas",
+    "en": "forklift",
+    "es": "el montacargas",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "telehandler|el montacargas telescópico",
+    "en": "telehandler",
+    "es": "el montacargas telescópico",
+    "trade": "Equipment",
+    "region": "Mexico: el telehandler"
+  },
+  {
+    "id": "scissor lift|la plataforma de tijera",
+    "en": "scissor lift",
+    "es": "la plataforma de tijera",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "boom lift|la plataforma articulada",
+    "en": "boom lift",
+    "es": "la plataforma articulada",
+    "trade": "Equipment",
+    "region": "Mexico: la canastilla"
+  },
+  {
+    "id": "man basket|la canastilla",
+    "en": "man basket",
+    "es": "la canastilla",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "front loader|el cargador frontal",
+    "en": "front loader",
+    "es": "el cargador frontal",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "bucket (on a machine)|el bote",
+    "en": "bucket (on a machine)",
+    "es": "el bote",
+    "trade": "Equipment",
+    "region": "Also: el cucharón"
+  },
+  {
+    "id": "outrigger|el estabilizador",
+    "en": "outrigger",
+    "es": "el estabilizador",
+    "trade": "Equipment",
+    "region": "Also: la pata"
+  },
+  {
+    "id": "counterweight|el contrapeso",
+    "en": "counterweight",
+    "es": "el contrapeso",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "boom|la pluma",
+    "en": "boom",
+    "es": "la pluma",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "hook|el gancho",
+    "en": "hook",
+    "es": "el gancho",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "sling|la eslinga",
+    "en": "sling",
+    "es": "la eslinga",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "shackle|el grillete",
+    "en": "shackle",
+    "es": "el grillete",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "chain|la cadena",
+    "en": "chain",
+    "es": "la cadena",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "wire rope|el cable de acero",
+    "en": "wire rope",
+    "es": "el cable de acero",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "tag line|la cuerda guía",
+    "en": "tag line",
+    "es": "la cuerda guía",
+    "trade": "Equipment",
+    "region": "Also: el viento"
+  },
+  {
+    "id": "spotter / signalman|el señalero",
+    "en": "spotter / signalman",
+    "es": "el señalero",
+    "trade": "Equipment",
+    "region": "Also: el vigía"
+  },
+  {
+    "id": "hand signals|las señales de mano",
+    "en": "hand signals",
+    "es": "las señales de mano",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "swing radius|el radio de giro",
+    "en": "swing radius",
+    "es": "el radio de giro",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "the load|la carga",
+    "en": "the load",
+    "es": "la carga",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "load chart|la tabla de cargas",
+    "en": "load chart",
+    "es": "la tabla de cargas",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "capacity|la capacidad",
+    "en": "capacity",
+    "es": "la capacidad",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "lift plan|el plan de izaje",
+    "en": "lift plan",
+    "es": "el plan de izaje",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "the pick / hoist|el izaje",
+    "en": "the pick / hoist",
+    "es": "el izaje",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "pallet|la tarima",
+    "en": "pallet",
+    "es": "la tarima",
+    "trade": "Equipment",
+    "region": "Also: el palet"
+  },
+  {
+    "id": "pallet jack|el patín hidráulico",
+    "en": "pallet jack",
+    "es": "el patín hidráulico",
+    "trade": "Equipment",
+    "region": "Mexico: el patín"
+  },
+  {
+    "id": "crane operator|el operador de grúa",
+    "en": "crane operator",
+    "es": "el operador de grúa",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "rigger|el maniobrista",
+    "en": "rigger",
+    "es": "el maniobrista",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "Raise it.|Súbalo.",
+    "en": "Raise it.",
+    "es": "Súbalo.",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "Lower it.|Bájelo.",
+    "en": "Lower it.",
+    "es": "Bájelo.",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "Stop the load.|Pare la carga.",
+    "en": "Stop the load.",
+    "es": "Pare la carga.",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "Clear the area.|Despeje el área.",
+    "en": "Clear the area.",
+    "es": "Despeje el área.",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "Don't walk under the load.|No camine debajo de la carga.",
+    "en": "Don't walk under the load.",
+    "es": "No camine debajo de la carga.",
+    "trade": "Equipment",
+    "region": ""
+  },
+  {
+    "id": "Back it up.|Retroceda.",
+    "en": "Back it up.",
+    "es": "Retroceda.",
+    "trade": "Equipment",
+    "region": "Also: hágase para atrás"
+  },
+  {
+    "id": "above|arriba de",
+    "en": "above",
+    "es": "arriba de",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "below / under|debajo de",
+    "en": "below / under",
+    "es": "debajo de",
+    "trade": "Quality",
+    "region": "Also: abajo de"
+  },
+  {
+    "id": "behind|detrás de",
+    "en": "behind",
+    "es": "detrás de",
+    "trade": "Quality",
+    "region": "Mexico: atrás de"
+  },
+  {
+    "id": "in front of|enfrente de",
+    "en": "in front of",
+    "es": "enfrente de",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "next to|al lado de",
+    "en": "next to",
+    "es": "al lado de",
+    "trade": "Quality",
+    "region": "Also: junto a"
+  },
+  {
+    "id": "between|entre",
+    "en": "between",
+    "es": "entre",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "inside|adentro",
+    "en": "inside",
+    "es": "adentro",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "outside|afuera",
+    "en": "outside",
+    "es": "afuera",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "on top of|encima de",
+    "en": "on top of",
+    "es": "encima de",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "to the left|a la izquierda",
+    "en": "to the left",
+    "es": "a la izquierda",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "to the right|a la derecha",
+    "en": "to the right",
+    "es": "a la derecha",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "straight ahead|derecho",
+    "en": "straight ahead",
+    "es": "derecho",
+    "trade": "Quality",
+    "region": "Careful: derecha = right"
+  },
+  {
+    "id": "centered|centrado",
+    "en": "centered",
+    "es": "centrado",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "lined up|alineado",
+    "en": "lined up",
+    "es": "alineado",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "crooked|chueco",
+    "en": "crooked",
+    "es": "chueco",
+    "trade": "Quality",
+    "region": "Formal: torcido"
+  },
+  {
+    "id": "backwards / upside down|al revés",
+    "en": "backwards / upside down",
+    "es": "al revés",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "flush with|al ras con",
+    "en": "flush with",
+    "es": "al ras con",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "rework|el retrabajo",
+    "en": "rework",
+    "es": "el retrabajo",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "defect|el defecto",
+    "en": "defect",
+    "es": "el defecto",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "mistake|el error",
+    "en": "mistake",
+    "es": "el error",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "approved|aprobado",
+    "en": "approved",
+    "es": "aprobado",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "rejected|rechazado",
+    "en": "rejected",
+    "es": "rechazado",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "It's crooked.|Está chueco.",
+    "en": "It's crooked.",
+    "es": "Está chueco.",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "It doesn't match the plans.|No coincide con los planos.",
+    "en": "It doesn't match the plans.",
+    "es": "No coincide con los planos.",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "Take it out.|Quítelo.",
+    "en": "Take it out.",
+    "es": "Quítelo.",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "Do it over.|Hágalo de nuevo.",
+    "en": "Do it over.",
+    "es": "Hágalo de nuevo.",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "Fix it.|Arréglelo.",
+    "en": "Fix it.",
+    "es": "Arréglelo.",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "Check it.|Revíselo.",
+    "en": "Check it.",
+    "es": "Revíselo.",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "It doesn't fit.|No cabe.",
+    "en": "It doesn't fit.",
+    "es": "No cabe.",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "It's too tight.|Está muy apretado.",
+    "en": "It's too tight.",
+    "es": "Está muy apretado.",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "It's loose.|Está flojo.",
+    "en": "It's loose.",
+    "es": "Está flojo.",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "Something's missing.|Falta algo.",
+    "en": "Something's missing.",
+    "es": "Falta algo.",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "That's good.|Así está bien.",
+    "en": "That's good.",
+    "es": "Así está bien.",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "Don't cover it yet.|No lo tape todavía.",
+    "en": "Don't cover it yet.",
+    "es": "No lo tape todavía.",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "Inspection comes first.|Primero falta la inspección.",
+    "en": "Inspection comes first.",
+    "es": "Primero falta la inspección.",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "Move it two inches.|Muévalo dos pulgadas.",
+    "en": "Move it two inches.",
+    "es": "Muévalo dos pulgadas.",
+    "trade": "Quality",
+    "region": ""
+  },
+  {
+    "id": "rain|la lluvia",
+    "en": "rain",
+    "es": "la lluvia",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "It's raining.|Está lloviendo.",
+    "en": "It's raining.",
+    "es": "Está lloviendo.",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "rain delay|el retraso por lluvia",
+    "en": "rain delay",
+    "es": "el retraso por lluvia",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "storm|la tormenta",
+    "en": "storm",
+    "es": "la tormenta",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "lightning|los rayos",
+    "en": "lightning",
+    "es": "los rayos",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "thunder|el trueno",
+    "en": "thunder",
+    "es": "el trueno",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "wind|el viento",
+    "en": "wind",
+    "es": "el viento",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "heat|el calor",
+    "en": "heat",
+    "es": "el calor",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "shade|la sombra",
+    "en": "shade",
+    "es": "la sombra",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "drinking water|el agua potable",
+    "en": "drinking water",
+    "es": "el agua potable",
+    "trade": "Weather",
+    "region": "On site, just: agua"
+  },
+  {
+    "id": "cold|el frío",
+    "en": "cold",
+    "es": "el frío",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "ice|el hielo",
+    "en": "ice",
+    "es": "el hielo",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "slippery|resbaloso",
+    "en": "slippery",
+    "es": "resbaloso",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "forecast|el pronóstico",
+    "en": "forecast",
+    "es": "el pronóstico",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "sunscreen|el bloqueador solar",
+    "en": "sunscreen",
+    "es": "el bloqueador solar",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "Drink water.|Tome agua.",
+    "en": "Drink water.",
+    "es": "Tome agua.",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "Rest in the shade.|Descanse en la sombra.",
+    "en": "Rest in the shade.",
+    "es": "Descanse en la sombra.",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "It's too hot.|Hace mucho calor.",
+    "en": "It's too hot.",
+    "es": "Hace mucho calor.",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "Are you feeling okay?|¿Se siente bien?",
+    "en": "Are you feeling okay?",
+    "es": "¿Se siente bien?",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "Careful, it's slippery.|Cuidado, está resbaloso.",
+    "en": "Careful, it's slippery.",
+    "es": "Cuidado, está resbaloso.",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "There's lightning. Come down.|Hay rayos. Bájese.",
+    "en": "There's lightning. Come down.",
+    "es": "Hay rayos. Bájese.",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "We're shutting down.|Vamos a parar.",
+    "en": "We're shutting down.",
+    "es": "Vamos a parar.",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "No work today.|Hoy no hay trabajo.",
+    "en": "No work today.",
+    "es": "Hoy no hay trabajo.",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "Is it going to rain?|¿Va a llover?",
+    "en": "Is it going to rain?",
+    "es": "¿Va a llover?",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "The site is closed.|La obra está cerrada.",
+    "en": "The site is closed.",
+    "es": "La obra está cerrada.",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "Come in early tomorrow.|Venga temprano mañana.",
+    "en": "Come in early tomorrow.",
+    "es": "Venga temprano mañana.",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "We start at six.|Empezamos a las seis.",
+    "en": "We start at six.",
+    "es": "Empezamos a las seis.",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "Take ten minutes.|Tome diez minutos.",
+    "en": "Take ten minutes.",
+    "es": "Tome diez minutos.",
+    "trade": "Weather",
+    "region": ""
+  },
+  {
+    "id": "Good morning.|Buenos días.",
+    "en": "Good morning.",
+    "es": "Buenos días.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "How's it going?|¿Cómo va?",
+    "en": "How's it going?",
+    "es": "¿Cómo va?",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "How is the work going?|¿Cómo va el trabajo?",
+    "en": "How is the work going?",
+    "es": "¿Cómo va el trabajo?",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Everything good?|¿Todo bien?",
+    "en": "Everything good?",
+    "es": "¿Todo bien?",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Good work.|Buen trabajo.",
+    "en": "Good work.",
+    "es": "Buen trabajo.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Thank you.|Gracias.",
+    "en": "Thank you.",
+    "es": "Gracias.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Please.|Por favor.",
+    "en": "Please.",
+    "es": "Por favor.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "See you tomorrow.|Hasta mañana.",
+    "en": "See you tomorrow.",
+    "es": "Hasta mañana.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Come here, please.|Venga, por favor.",
+    "en": "Come here, please.",
+    "es": "Venga, por favor.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Wait a moment.|Espere un momento.",
+    "en": "Wait a moment.",
+    "es": "Espere un momento.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Stop.|Pare.",
+    "en": "Stop.",
+    "es": "Pare.",
+    "trade": "Phrases",
+    "region": "Urgent: ¡Alto!"
+  },
+  {
+    "id": "Let's go.|Vámonos.",
+    "en": "Let's go.",
+    "es": "Vámonos.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Follow me.|Sígame.",
+    "en": "Follow me.",
+    "es": "Sígame.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Over here.|Por acá.",
+    "en": "Over here.",
+    "es": "Por acá.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Over there.|Por allá.",
+    "en": "Over there.",
+    "es": "Por allá.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Not there.|Ahí no.",
+    "en": "Not there.",
+    "es": "Ahí no.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Like this.|Así.",
+    "en": "Like this.",
+    "es": "Así.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Do it again.|Hágalo otra vez.",
+    "en": "Do it again.",
+    "es": "Hágalo otra vez.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Turn it off.|Apáguelo.",
+    "en": "Turn it off.",
+    "es": "Apáguelo.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Turn it on.|Préndalo.",
+    "en": "Turn it on.",
+    "es": "Préndalo.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Clean this up.|Limpie esto.",
+    "en": "Clean this up.",
+    "es": "Limpie esto.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Move this.|Mueva esto.",
+    "en": "Move this.",
+    "es": "Mueva esto.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Careful!|¡Cuidado!",
+    "en": "Careful!",
+    "es": "¡Cuidado!",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Do you need anything?|¿Necesita algo?",
+    "en": "Do you need anything?",
+    "es": "¿Necesita algo?",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "What do you need?|¿Qué necesita?",
+    "en": "What do you need?",
+    "es": "¿Qué necesita?",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Do you have material?|¿Tiene material?",
+    "en": "Do you have material?",
+    "es": "¿Tiene material?",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "How much longer?|¿Cuánto falta?",
+    "en": "How much longer?",
+    "es": "¿Cuánto falta?",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "When will it be done?|¿Cuándo termina?",
+    "en": "When will it be done?",
+    "es": "¿Cuándo termina?",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Is it done?|¿Ya está?",
+    "en": "Is it done?",
+    "es": "¿Ya está?",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "What happened?|¿Qué pasó?",
+    "en": "What happened?",
+    "es": "¿Qué pasó?",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Who is the foreman?|¿Quién es el mayordomo?",
+    "en": "Who is the foreman?",
+    "es": "¿Quién es el mayordomo?",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Do you understand me?|¿Me entiende?",
+    "en": "Do you understand me?",
+    "es": "¿Me entiende?",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Can you repeat that?|¿Puede repetir?",
+    "en": "Can you repeat that?",
+    "es": "¿Puede repetir?",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Where is it?|¿Dónde está?",
+    "en": "Where is it?",
+    "es": "¿Dónde está?",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "How many?|¿Cuántos?",
+    "en": "How many?",
+    "es": "¿Cuántos?",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Put on your hard hat.|Póngase el casco.",
+    "en": "Put on your hard hat.",
+    "es": "Póngase el casco.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Wear your safety glasses.|Use sus lentes.",
+    "en": "Wear your safety glasses.",
+    "es": "Use sus lentes.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Is anyone hurt?|¿Hay alguien herido?",
+    "en": "Is anyone hurt?",
+    "es": "¿Hay alguien herido?",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Everybody out.|Salgan todos.",
+    "en": "Everybody out.",
+    "es": "Salgan todos.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Don't do that.|No haga eso.",
+    "en": "Don't do that.",
+    "es": "No haga eso.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "I don't speak much Spanish.|No hablo mucho español.",
+    "en": "I don't speak much Spanish.",
+    "es": "No hablo mucho español.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Speak slower, please.|Hable más despacio.",
+    "en": "Speak slower, please.",
+    "es": "Hable más despacio.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "One moment.|Un momento.",
+    "en": "One moment.",
+    "es": "Un momento.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Tomorrow at seven.|Mañana a las siete.",
+    "en": "Tomorrow at seven.",
+    "es": "Mañana a las siete.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "We need this today.|Necesitamos esto hoy.",
+    "en": "We need this today.",
+    "es": "Necesitamos esto hoy.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "It's not level.|No está a nivel.",
+    "en": "It's not level.",
+    "es": "No está a nivel.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "It's not plumb.|No está a plomo.",
+    "en": "It's not plumb.",
+    "es": "No está a plomo.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Measure it again.|Mídalo otra vez.",
+    "en": "Measure it again.",
+    "es": "Mídalo otra vez.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "Bring me the drawings.|Tráigame los planos.",
+    "en": "Bring me the drawings.",
+    "es": "Tráigame los planos.",
+    "trade": "Phrases",
+    "region": ""
+  },
+  {
+    "id": "That's all for today.|Eso es todo por hoy.",
+    "en": "That's all for today.",
+    "es": "Eso es todo por hoy.",
+    "trade": "Phrases",
+    "region": ""
+  }
+]
