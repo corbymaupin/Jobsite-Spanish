@@ -13,3 +13,7 @@
 *.aab
 gradlew-helper
 .kotlin/
+
+keystore.properties
+*.jks
+*.keystore

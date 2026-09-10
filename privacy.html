@@ -46,8 +46,8 @@
   <p class="updated">Jobsite Spanish · last updated September 2026</p>
 
   <div class="card">
-    <p><strong>Short version: this app collects nothing, sends nothing, and has no servers.</strong>
-    Everything it does happens on your own device.</p>
+    <p><strong>Short version: study data stays on your device; the app has no backend servers.</strong>
+    Optional feedback email leaves the device only if you choose to send it.</p>
   </div>
 
   <h2>What data this app collects</h2>
@@ -56,20 +56,24 @@
 
   <h2>What data this app stores, and where</h2>
   <p>Your study progress — which words you've learned, your review schedule, and your
-  streak — is saved only in your device's local browser storage
-  (<code>localStorage</code>). This data:</p>
+  streak — is saved only in <strong>on-device app storage</strong> (Android private app
+  storage / DataStore; the web demo uses browser <code>localStorage</code>). This data:</p>
   <ul>
-    <li>never leaves your device</li>
-    <li>is never sent to any server, because the app has no server to send it to</li>
-    <li>is not visible to the developer or to anyone else</li>
-    <li>is deleted if you clear your browser/app data, and is not backed up anywhere by this app</li>
+    <li>stays on your device during normal study use</li>
+    <li>is never uploaded to an app server — the app has none</li>
+    <li>is not visible to the developer unless you choose to contact us</li>
+    <li>is deleted if you clear the app's storage / data, and is not backed up by this app to our servers</li>
   </ul>
 
   <h2>Network access</h2>
-  <p>The app makes no network requests while in use. Speech playback (Listen mode) uses
-  your device's own built-in text-to-speech engine, entirely offline. The one-time page
-  load to install or update the app is the only network activity involved, and that
-  request carries no personal data — it's the same as loading any web page.</p>
+  <p>Study, Listen, Browse, and Stats work fully offline. Speech playback uses your
+  device's built-in text-to-speech engine. The Play / web install or update is the only
+  required network activity for getting the app, and that request carries no study data.</p>
+  <p><strong>Optional feedback:</strong> if you use the in-app Feedback form and send
+  email, the message (and optional reply address) leaves your device through your own
+  email app to <a href="mailto:james.corby.maupin@gmail.com">james.corby.maupin@gmail.com</a>.
+  Nothing is sent until you tap send in your mail client. You can also copy the feedback
+  text without sending anything.</p>
 
   <h2>Third parties</h2>
   <p>There are none. No advertising SDKs, no analytics SDKs, no crash reporting, no

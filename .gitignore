@@ -1,2 +1,6 @@
 node_modules/
 test/screenshots/
+
+android/keystore.properties
+*.jks
+*.keystore

@@ -70,7 +70,7 @@ fun StudyScreen(vm: AppViewModel) {
             }
             Spacer(Modifier.height(8.dp))
             Button(
-                onClick = { vm.startSession(categoryMode = state.trade != "All" && false) },
+                onClick = { vm.startSession(categoryMode = false) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = JobsiteAccent)
             ) {

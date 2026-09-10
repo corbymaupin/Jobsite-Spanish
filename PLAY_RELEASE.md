@@ -3,115 +3,142 @@
 **Repo today:** https://github.com/corbymaupin/Jobsite-Spanish  
 **Live web demo (reference only):** https://corbymaupin.github.io/Jobsite-Spanish/
 
-## What the repo is today
+## Product decisions (Corby / Ada)
 
-Native Play code lives in **`android/`** — Kotlin + Jetpack Compose, package id `com.corbymaupin.jobsitespanish`. Open that folder in Android Studio (Sync → Run). See `android/README.md`.
-
-The repo root remains the **web PWA** (`index.html`, `manifest.json`, `sw.js`, icons) as behavior/content reference and demo. **TWA / Capacitor / Cordova / WebView wraps stay retired** — Play ships from the native Compose app only.
-
+| Decision | Detail |
+|---|---|
+| Stack | **Native Kotlin + Jetpack Compose only** (`android/`). No WebView / TWA / Capacitor / Cordova. |
+| Package | `com.corbymaupin.jobsitespanish` |
+| Monetization | **Paid app · $3.99** one-time (set in Play Console, **not** in code). **Do not** add Play Billing Library for this. |
+| Classmates | Free via **Play Console paid-app promo codes** (up to **500 / quarter**). Ada/Corby distribute codes; no in-app unlock. |
+| Feedback | In-app **Feedback** tab → prefilled email to `james.corby.maupin@gmail.com` (subject `[Jobsite Spanish Feedback]`) + copy-text button. **Ada absorbs feedback from that Gmail inbox.** |
+| Version (first release) | `versionName 1.0.0` / `versionCode 1` |
+| Network | Offline-only study. **No `INTERNET` permission** (fine for Play). Feedback leaves the device only when the user sends email. |
 
 ---
 
-## Recommended native approach (least rewrite, clearly native)
+## What the repo is today
 
-**Primary recommendation: Kotlin + Jetpack Compose**
+Native Play code lives in **`android/`** — Kotlin + Jetpack Compose. Open that folder in Android Studio (Sync → Run). See `android/README.md`.
 
-Why this over other options:
+The repo root remains the **web PWA** (`index.html`, `manifest.json`, `sw.js`, icons) as behavior/content reference and demo. **TWA / Capacitor / Cordova / WebView wraps stay retired.**
 
-| Option | Verdict |
-|---|---|
-| **Kotlin + Jetpack Compose** | **Chosen.** Real Android UI toolkit, Play-native tooling, on-device `TextToSpeech`, Room/DataStore for progress. Unambiguous “native,” no WebView. |
-| Flutter (Dart) | Fine backup if we want iOS later from one codebase. Still a full UI rewrite; not less work for Android-only. |
-| React Native | Native views, but JS-centric; easier to confuse with “web stack.” Skip unless Corby prefers JS. |
-| TWA / Capacitor / Cordova | **Disallowed** for this Play release. |
-
-The web app’s hard parts are **data + rules**, not a huge UI surface. Those port cleanly:
-
-1. **Export `SEED_TERMS`** (387 cards × trade/region/en/es) → `assets/terms.json` (or Kotlin `terms` module).
-2. **Port Leitner SRS + session rotation** (boxes, due dates, 30/70 new/review flow, streak) → domain layer in Kotlin.
-3. **Port screens** — Study, Listen, Browse, Stats — in Compose (same IA as the web app).
-4. **Replace `speechSynthesis`** → Android `TextToSpeech` (Spanish voice).
-5. **Replace `localStorage`** → DataStore or Room (progress + streak only; terms stay in assets).
-6. **Reuse store art** already in `store-assets/` and `icons/` (regenerate adaptive icon mipmaps from `icon-512.png`).
-
-Layout (scaffolded under `android/`):
+Layout:
 
 ```
 android/
   app/src/main/java/com/corbymaupin/jobsitespanish/
-    ui/   Study, Listen, Browse, Stats
-    data/ TermsRepository, ProgressStore
+    ui/   Study, Listen, Browse, Stats, Feedback
+    data/ TermsRepository, ProgressStore (DataStore)
     srs/  Leitner + session builder
     tts/  Speech (TextToSpeech)
   app/src/main/assets/terms.json
 ```
 
-**Application id:** `com.corbymaupin.jobsitespanish`  
-**First version:** `versionName 1.0.0` / `versionCode 1`  
-**Min SDK:** 26 (Android 8) is enough for TTS + DataStore; target / compile SDK = current Play requirement (PWABuilder no longer applies — use Android Studio defaults for 2026 Play target SDK).
+---
+
+## Build release AAB (`bundleRelease`)
+
+### Debug (CI / smoke)
+
+```bash
+cd android
+./gradlew assembleDebug
+# APK: app/build/outputs/apk/debug/app-debug.apk
+```
+
+### Signed release AAB (what Play wants)
+
+1. **Corby creates a keystore** (once). Do **not** invent or commit passwords.
+
+```bash
+keytool -genkey -v -keystore jobsite-spanish-upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias jobsite-spanish
+```
+
+Store the `.jks` and passwords in a password manager — **never commit** them to git.
+
+2. Create `android/keystore.properties` (gitignored) locally:
+
+```properties
+storeFile=/absolute/path/to/jobsite-spanish-upload.jks
+storePassword=YOUR_STORE_PASSWORD
+keyAlias=jobsite-spanish
+keyPassword=YOUR_KEY_PASSWORD
+```
+
+3. Wire signing in Android Studio (**Build → Generate Signed Bundle / APK**) **or** add a `signingConfigs` block in `app/build.gradle.kts` that reads `keystore.properties` (optional; Studio UI is enough for v1).
+
+4. Build:
+
+```bash
+cd android
+./gradlew bundleRelease
+# AAB: app/build/outputs/bundle/release/app-release.aab
+```
+
+Without a keystore, `bundleRelease` may produce an **unsigned** or debug-signed artifact depending on config — **Play requires a properly signed upload key** (or Play App Signing enrollment with an upload key Corby controls).
+
+5. Upload `app-release.aab` to Play Console → **Internal testing** first, then production.
+
+### Unsigned / debug-signing note
+
+If you only need a local AAB smoke check and have no keystore yet:
+
+```bash
+cd android
+./gradlew bundleRelease
+```
+
+Inspect `app/build/outputs/bundle/release/`. For Play upload, Corby must still create the upload keystore and sign (or use Android Studio’s signed-bundle wizard).
 
 ---
 
-## Feature parity checklist (from web → native)
+## Play Console checklist
 
-- [x] 387 cards / 13 trades loaded from assets
-- [x] Study: flip card, correct/incorrect, Leitner scheduling (scaffold)
-- [x] Session new-card rotation (~30/70 vs reviews; graduate after 2 correct) (scaffold)
-- [x] Category / trade practice mode (scaffold)
-- [x] Listen mode (hands-free queue, does not move Leitner boxes) (basic)
-- [x] Browse deck by trade
-- [x] Stats: streak, totals, box gauge
-- [x] Offline-only runtime (no network required after install)
-- [ ] Bilingual study-home toggle (if keeping web parity)
-- [ ] Privacy policy URL (can keep hosted `privacy.html`; update wording from “browser localStorage” → “on-device app storage”)
-
----
-
-## Play Console (unchanged needs)
-
-Still required from Corby:
-
-1. Google Play developer account ($25)
-2. Upload key / Play App Signing (Android Studio / Play Console — **not** PWABuilder)
-3. Listing copy — draft remains in `store-assets/LISTING.md` (minor edits OK)
-4. Icon, feature graphic, screenshots — existing assets are usable; re-capture screenshots from the **native** UI before submit
-5. Data safety: no data collected / on-device only
-6. Privacy policy URL (update text for native storage)
+1. Google Play developer account ($25) — **Corby**
+2. Create app → package `com.corbymaupin.jobsitespanish`
+3. **Pricing:** Paid · **$3.99** USD (and other countries as needed)
+4. **Promo codes:** Generate paid-app promo codes for classmates (quota ~500/quarter)
+5. Upload signed AAB; enable **Play App Signing**
+6. Listing copy — `store-assets/LISTING.md` (developer name: **Applied Solutions Lab**)
+7. Icon / feature graphic / **native** screenshots (re-shoot from Compose UI)
+8. Data safety: no data collected / on-device only; optional feedback email only when user sends
+9. Privacy policy URL: https://corbymaupin.github.io/Jobsite-Spanish/privacy.html
+10. Content rating questionnaire
 
 ---
 
-## What’s done vs what needs Corby
+## Feature parity checklist (web → native)
 
-| Item | Status |
-|---|---|
-| Web reference app + vocabulary | Done (this repo) |
-| Store listing draft | Done — `store-assets/LISTING.md` |
-| Feature graphic + old screenshots | Done (re-shoot after native UI) |
-| Privacy page (web wording) | Done — needs native wording tweak |
-| Native Android project (Compose) | **Not started** |
-| `terms.json` export from `SEED_TERMS` | **Not started** |
-| Signed `.aab` from Android Studio | Needs native project + Corby keystore |
-| Play developer account | **Corby** |
-| Final store screenshots from native builds | After UI exists |
-| Approve package id / display name | **Corby** (default above) |
+- [x] 387 cards / 13 trades from assets
+- [x] Study / Listen / Browse / Stats
+- [x] Leitner SRS + session rotation (scaffold)
+- [x] Offline-only runtime (no INTERNET)
+- [x] Feedback screen (email + copy)
+- [x] Adaptive icons from `icons/icon-512.png`
+- [x] Privacy wording for on-device app storage
+- [ ] Bilingual study-home toggle (optional parity)
+- [ ] Final native store screenshots
+
+---
+
+## Feedback ops (Ada)
+
+Users tap **Feedback** → choose Bug / Idea / Praise → write a message (optional reply email) → **Email feedback** opens a mail client to `james.corby.maupin@gmail.com` with subject `[Jobsite Spanish Feedback]` and body including app version + Android SDK. **Copy feedback text** is available if no mail app. Ada triages that Gmail inbox; no backend or Play Billing required.
 
 ---
 
 ## Retired (do not use for Play)
 
 - PWABuilder / Bubblewrap / TWA
-- Capacitor / Cordova / PhoneGap / any WebView shell around `index.html`
-- `.well-known/assetlinks.json` for chrome-less TWA (only relevant to the retired path; template may remain but is not the Play plan)
+- Capacitor / Cordova / PhoneGap / any WebView shell
+- Play Billing Library (paid app is Console-priced; classmates use promo codes)
+- Committing keystores or passwords
 
 ---
 
-## Next engineering steps
+## Out of scope (this release)
 
-1. Scaffold Kotlin Compose app with package `com.corbymaupin.jobsitespanish`.
-2. Extract `SEED_TERMS` → `terms.json` and load in-app.
-3. Implement progress store + Leitner domain to match web behavior.
-4. Build Study → Listen → Browse → Stats.
-5. Wire Android TTS (es).
-6. Debug/release signing, Play internal testing track, then production.
-
-Out of scope until Jobsite Play-ready: law-enforcement Spanish native port (same engine + different `terms.json` later).
+- Law-enforcement Spanish app (separate worker)
+- Actually uploading to Play Console (Corby)
+- Piddly UI polish

@@ -6,9 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Feedback
+import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -27,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.corbymaupin.jobsitespanish.ui.AppViewModel
 import com.corbymaupin.jobsitespanish.ui.navigation.Dest
 import com.corbymaupin.jobsitespanish.ui.screens.BrowseScreen
+import com.corbymaupin.jobsitespanish.ui.screens.FeedbackScreen
 import com.corbymaupin.jobsitespanish.ui.screens.ListenScreen
 import com.corbymaupin.jobsitespanish.ui.screens.StatsScreen
 import com.corbymaupin.jobsitespanish.ui.screens.StudyScreen
@@ -83,6 +85,7 @@ class MainActivity : ComponentActivity() {
                         composable(Dest.Listen.route) { ListenScreen(vm) }
                         composable(Dest.Browse.route) { BrowseScreen(vm) }
                         composable(Dest.Stats.route) { StatsScreen(vm) }
+                        composable(Dest.Feedback.route) { FeedbackScreen() }
                     }
                 }
             }
@@ -94,5 +97,6 @@ class MainActivity : ComponentActivity() {
         Dest.Listen -> Icons.Filled.Headphones
         Dest.Browse -> Icons.AutoMirrored.Filled.List
         Dest.Stats -> Icons.Filled.BarChart
+        Dest.Feedback -> Icons.Filled.Feedback
     }
 }
