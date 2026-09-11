@@ -9,7 +9,7 @@
 |---|---|
 | Stack | **Native Kotlin + Jetpack Compose only** (`android/`). No WebView / TWA / Capacitor / Cordova. |
 | Package | `com.corbymaupin.jobsitespanish` |
-| Monetization | **Paid app · $3.99** one-time (set in Play Console, **not** in code). **Do not** add Play Billing Library for this. |
+| Monetization | **Paid app · $1.99** one-time (set in Play Console, **not** in code). **Do not** add Play Billing Library for this. |
 | Classmates | Free via **Play Console paid-app promo codes** (up to **500 / quarter**). Ada/Corby distribute codes; no in-app unlock. |
 | Feedback | In-app **Feedback** tab → prefilled email to `james.corby.maupin@gmail.com` (subject `[Jobsite Spanish Feedback]`) + copy-text button. **Ada absorbs feedback from that Gmail inbox.** |
 | Version (first release) | `versionName 1.0.0` / `versionCode 1` |
@@ -97,7 +97,7 @@ Inspect `app/build/outputs/bundle/release/`. For Play upload, Corby must still c
 
 1. Google Play developer account ($25) — **Corby**
 2. Create app → package `com.corbymaupin.jobsitespanish`
-3. **Pricing:** Paid · **$3.99** USD (and other countries as needed)
+3. **Pricing:** Paid · **$1.99** USD (and other countries as needed)
 4. **Promo codes:** Generate paid-app promo codes for classmates (quota ~500/quarter)
 5. Upload signed AAB; enable **Play App Signing**
 6. Listing copy — `store-assets/LISTING.md` (developer name: **Applied Solutions Lab**)

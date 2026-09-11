@@ -9,7 +9,7 @@ Jobsite Spanish
 Applied Solutions Lab
 
 ## Price
-Paid · **$3.99** USD one-time (set in Play Console). Classmates: free via Play promo codes (not an in-app unlock).
+Paid · **$1.99** USD one-time (set in Play Console). Classmates: free via Play promo codes (not an in-app unlock).
 
 ## Short description (80 chars max)
 Construction Spanish for Texas crews — 387 cards, offline, spaced repetition.
@@ -33,7 +33,7 @@ Built for the jobsite:
 
 Made for construction supervisors and crew leads who want practical Spanish, not classroom fluff.
 
-One-time purchase ($3.99). No ads, no subscription, no account.
+One-time purchase ($1.99). No ads, no subscription, no account.
 
 ## Category
 Education (or Tools — Education preferred)

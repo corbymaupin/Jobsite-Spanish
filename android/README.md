@@ -6,7 +6,7 @@
 
 ## Monetization
 
-- **Paid app at $3.99** (one-time) — set in **Google Play Console**, not in this project.
+- **Paid app at $1.99** (one-time) — set in **Google Play Console**, not in this project.
 - **Do not** add the Play Billing Library for unlocks or IAP.
 - Classmates get free copies via **Play Console paid-app promo codes** (up to ~500/quarter). Corby/Ada distribute codes outside the app.
 
