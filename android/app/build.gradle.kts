@@ -6,14 +6,14 @@ plugins {
 
 android {
     namespace = "com.corbymaupin.jobsitespanish"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.corbymaupin.jobsitespanish"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        targetSdk = 36
+        versionCode = 3
+        versionName = "1.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -45,6 +45,10 @@ android {
 }
 
 dependencies {
+    // Do NOT add com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
+    // without also shipping Guava. That empty jar strips ListenableFuture and crashes the
+    // app a few seconds after open when Activity/Compose report fully drawn (1.0.1 bug).
+
     val composeBom = platform("androidx.compose:compose-bom:2024.10.01")
     implementation(composeBom)
     androidTestImplementation(composeBom)

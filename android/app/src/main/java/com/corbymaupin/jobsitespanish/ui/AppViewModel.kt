@@ -88,7 +88,14 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     private var streak = StreakState()
 
     init {
-        viewModelScope.launch { refreshAll() }
+        viewModelScope.launch {
+            try {
+                refreshAll()
+            } catch (t: Throwable) {
+                // Keep UI up even if assets/DataStore fail on first open
+                android.util.Log.e("AppViewModel", "refreshAll failed", t)
+            }
+        }
     }
 
     private suspend fun refreshAll() {
