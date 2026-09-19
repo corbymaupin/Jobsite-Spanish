@@ -1,3 +1,4 @@
+// app/src/main/java/com/corbymaupin/jobsitespanish/data/ProgressStore.kt
 package com.corbymaupin.jobsitespanish.data
 
 import android.content.Context
@@ -6,9 +7,14 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.corbymaupin.jobsitespanish.ui.LearningDirection
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import org.json.JSONObject
+import java.io.IOException
 
 private val Context.progressDataStore: DataStore<Preferences> by preferencesDataStore(
     name = "jobsite_spanish_v3"
@@ -17,12 +23,18 @@ private val Context.progressDataStore: DataStore<Preferences> by preferencesData
 /**
  * DataStore-backed progress mirroring web localStorage key jobsite-spanish-v3:
  * progress[cardKey] -> { box, introduced, nextReview }, streak, session.
+ *
+ * 1.0.3 adds one plain-string preference in the same store: "learning_direction"
+ * ("learn_spanish" / "learn_english"). progress_json, streak_json and session_json
+ * and their JSON shapes are unchanged.
  */
 class ProgressStore(private val context: Context) {
+
 
     private val keyProgress = stringPreferencesKey("progress_json")
     private val keyStreak = stringPreferencesKey("streak_json")
     private val keySession = stringPreferencesKey("session_json")
+    private val keyLearningDirection = stringPreferencesKey("learning_direction")
 
     val progressFlow: Flow<Map<String, CardProgress>> =
         context.progressDataStore.data.map { prefs ->
@@ -39,12 +51,25 @@ class ProgressStore(private val context: Context) {
             parseSession(prefs[keySession])
         }
 
-    suspend fun getProgress(): Map<String, CardProgress> {
-        var result: Map<String, CardProgress> = emptyMap()
-        context.progressDataStore.data.map { parseProgress(it[keyProgress]) }
-            .collect { result = it; return@collect }
-        return result
-    }
+    /**
+     * Saved learning direction as its storage value. Missing -> LearningDirection.DEFAULT.
+     * A read error also falls back to the default instead of crashing.
+     * Map to the enum with LearningDirection.fromStorage(value).
+     */
+    val learningDirectionFlow: Flow<String> =
+        context.progressDataStore.data
+            .map { prefs -> prefs[keyLearningDirection] ?: LearningDirection.DEFAULT.storageValue }
+            .catch { e ->
+                if (e is IOException) emit(LearningDirection.DEFAULT.storageValue) else throw e
+            }
+            .distinctUntilChanged()
+
+
+    /**
+     * One-shot read of the current progress map.
+     * (The 1.0.2 version collected the endless DataStore flow and never returned.)
+     */
+    suspend fun getProgress(): Map<String, CardProgress> = progressFlow.first()
 
     suspend fun commitCard(id: String, progress: CardProgress) {
         context.progressDataStore.edit { prefs ->
@@ -71,11 +96,19 @@ class ProgressStore(private val context: Context) {
 
     suspend fun saveSession(session: SessionSnapshot?) {
         context.progressDataStore.edit { prefs ->
+
             if (session == null) {
                 prefs.remove(keySession)
             } else {
                 prefs[keySession] = encodeSession(session)
             }
+        }
+    }
+
+    /** Persist the learning direction (pass LearningDirection.storageValue). Touches only this key. */
+    suspend fun setLearningDirection(storageValue: String) {
+        context.progressDataStore.edit { prefs ->
+            prefs[keyLearningDirection] = storageValue
         }
     }
 
@@ -96,6 +129,7 @@ class ProgressStore(private val context: Context) {
             }
             return out
         }
+
 
         fun encodeProgress(map: Map<String, CardProgress>): String {
             val obj = JSONObject()
@@ -128,6 +162,7 @@ class ProgressStore(private val context: Context) {
             val gradsObj = o.optJSONObject("graduations") ?: JSONObject()
             val grads = mutableMapOf<String, Int>()
             val gKeys = gradsObj.keys()
+
             while (gKeys.hasNext()) {
                 val gk = gKeys.next()
                 grads[gk] = gradsObj.getInt(gk)

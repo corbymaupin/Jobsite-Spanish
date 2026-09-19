@@ -1,6 +1,8 @@
+// app/src/main/java/com/corbymaupin/jobsitespanish/ui/AppViewModel.kt
 package com.corbymaupin.jobsitespanish.ui
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.corbymaupin.jobsitespanish.data.DeckCard
@@ -15,23 +17,33 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlin.random.Random
+import kotlin.coroutines.cancellation.CancellationException
 
 data class StudyUiState(
     val phase: StudyPhase = StudyPhase.Home,
     val trade: String = "All",
     val current: DeckCard? = null,
     val revealed: Boolean = false,
-    val promptEnFirst: Boolean = true,
+    /**
+     * Kept for compatibility. Mirrors the learning-direction preference
+     * (true only for LEARN_ENGLISH). Never randomized.
+     */
+    val promptEnFirst: Boolean = LearningDirection.DEFAULT.promptIsEnglish,
     val isNew: Boolean = false,
+
     val right: Int = 0,
     val wrong: Int = 0,
     val remaining: Int = 0,
     val dueCount: Int = 0,
     val newPoolCount: Int = 0,
-    val canResume: Boolean = false
+    val canResume: Boolean = false,
+    /** False until terms + progress have loaded once (success or failure). Gates Start buttons. */
+    val ready: Boolean = false
 )
 
+/**
+ * Home = no active lesson (the visible lobby is HomeScreen), Session = card flow, Done = results.
+ */
 enum class StudyPhase { Home, Session, Done }
 
 data class StatsUiState(
@@ -51,6 +63,7 @@ data class ListenUiState(
     val sideLabel: String = "Paused",
     val text: String = "Tap play to hear cards",
     val cardTrade: String = ""
+
 )
 
 class AppViewModel(app: Application) : AndroidViewModel(app) {
@@ -65,6 +78,11 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     private val _study = MutableStateFlow(StudyUiState())
     val study: StateFlow<StudyUiState> = _study.asStateFlow()
 
+    private val _learningDirection = MutableStateFlow(LearningDirection.DEFAULT)
+
+    /** App-wide learning direction from the Home toggle. */
+    val learningDirection: StateFlow<LearningDirection> = _learningDirection.asStateFlow()
+
     private val _stats = MutableStateFlow(StatsUiState())
     val stats: StateFlow<StatsUiState> = _stats.asStateFlow()
 
@@ -78,6 +96,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     val trades: StateFlow<List<String>> = _trades.asStateFlow()
 
     private val _browseCards = MutableStateFlow<List<DeckCard>>(emptyList())
+
     val browseCards: StateFlow<List<DeckCard>> = _browseCards.asStateFlow()
 
     private var listenQueue: List<DeckCard> = emptyList()
@@ -87,16 +106,30 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     private var streak = StreakState()
 
+    /** Set when the user taps the toggle, so a slow first DataStore read can't undo the tap. */
+    private var directionPickedByUser = false
+
+    /** Blocks a double-tap from building two sessions (and introducing two batches of new cards). */
+    private var sessionLaunchInFlight = false
+
+    /** Blocks a double-tap from grading the same card twice. */
+    private var gradeInFlight = false
+
     init {
         viewModelScope.launch {
+            loadLearningDirection()
             try {
                 refreshAll()
+            } catch (c: CancellationException) {
+                throw c
             } catch (t: Throwable) {
                 // Keep UI up even if assets/DataStore fail on first open
-                android.util.Log.e("AppViewModel", "refreshAll failed", t)
+                Log.e(TAG, "refreshAll failed", t)
+                _study.value = _study.value.copy(ready = true)
             }
         }
     }
+
 
     private suspend fun refreshAll() {
         val terms = termsRepo.loadTerms()
@@ -109,7 +142,10 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         refreshBrowse()
         refreshStudyHome()
         val snap = store.sessionFlow.first()
-        _study.value = _study.value.copy(canResume = snap != null && snap.keys.isNotEmpty() && !snap.isCategoryMode)
+        _study.value = _study.value.copy(
+            canResume = snap != null && snap.keys.isNotEmpty() && !snap.isCategoryMode,
+            ready = true
+        )
     }
 
     private fun refreshStats() {
@@ -126,6 +162,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun refreshBrowse() {
         val t = _browseTrade.value
+
         _browseCards.value = deck.filter { Leitner.inTrade(it, t) }
     }
 
@@ -148,46 +185,131 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         refreshBrowse()
     }
 
-    fun startSession(categoryMode: Boolean = false) {
+    // ---- Learning direction ----
+
+    /** Home toggle. Updates the flow immediately, then persists. */
+    fun setLearningDirection(d: LearningDirection) {
+        directionPickedByUser = true
+        applyDirection(d)
         viewModelScope.launch {
-            val trade = _study.value.trade
-            val (session, fresh) = if (categoryMode && trade != "All") {
-                val s = sessionBuilder.buildCategorySet(deck, trade) ?: return@launch
-                s to emptyList()
-            } else {
-                sessionBuilder.buildWorkingSet(deck, trade)
+            try {
+                store.setLearningDirection(d.storageValue)
+            } catch (c: CancellationException) {
+
+                throw c
+            } catch (t: Throwable) {
+                Log.w(TAG, "Saving learning direction failed", t)
             }
-            if (session.queue.isEmpty()) {
-                _study.value = _study.value.copy(phase = StudyPhase.Done, right = 0, wrong = 0)
-                return@launch
+        }
+    }
+
+    private suspend fun loadLearningDirection() {
+        val saved = try {
+            LearningDirection.fromStorage(store.learningDirectionFlow.first())
+        } catch (c: CancellationException) {
+            throw c
+        } catch (t: Throwable) {
+            Log.w(TAG, "Loading learning direction failed; using default", t)
+            LearningDirection.DEFAULT
+        }
+        if (!directionPickedByUser) applyDirection(saved)
+    }
+
+    private fun applyDirection(d: LearningDirection) {
+        val changed = _learningDirection.value != d
+        _learningDirection.value = d
+        val s = _study.value
+        // A card already revealed in the old direction goes back to its (new) front.
+        val restartCard = changed && s.phase == StudyPhase.Session && s.revealed
+        if (restartCard) speech.stop()
+        _study.value = s.copy(
+            promptEnFirst = d.promptIsEnglish,
+            revealed = if (restartCard) false else s.revealed
+        )
+    }
+
+
+    // ---- Study session ----
+
+    fun startSession(categoryMode: Boolean = false) {
+        if (sessionLaunchInFlight) return
+        sessionLaunchInFlight = true
+        val trade = _study.value.trade
+        // Show the lesson surface right away so Home -> Study never flashes a stale screen.
+        _study.value = _study.value.copy(
+            phase = StudyPhase.Session,
+            current = null,
+            revealed = false,
+            isNew = false,
+            right = 0,
+            wrong = 0,
+            remaining = 0
+        )
+        viewModelScope.launch {
+            try {
+                val (session, fresh) = if (categoryMode && trade != "All") {
+                    val s = sessionBuilder.buildCategorySet(deck, trade) ?: run {
+                        _study.value = _study.value.copy(phase = StudyPhase.Home)
+                        return@launch
+                    }
+                    s to emptyList()
+                } else {
+                    sessionBuilder.buildWorkingSet(deck, trade)
+                }
+                if (session.queue.isEmpty()) {
+                    _study.value = _study.value.copy(phase = StudyPhase.Done, right = 0, wrong = 0)
+                    return@launch
+                }
+                // Persist introductions
+
+                fresh.forEach { store.commitCard(it.id, Leitner.toProgress(it)) }
+                liveSession = session
+                if (!session.isCategoryMode) {
+                    store.saveSession(session.toSnapshot())
+                }
+                _study.value = _study.value.copy(
+                    phase = StudyPhase.Session,
+                    right = 0,
+                    wrong = 0,
+                    revealed = false
+                )
+                nextCard()
+            } finally {
+                sessionLaunchInFlight = false
             }
-            // Persist introductions
-            fresh.forEach { store.commitCard(it.id, Leitner.toProgress(it)) }
-            liveSession = session
-            if (!session.isCategoryMode) {
-                store.saveSession(session.toSnapshot())
-            }
-            _study.value = _study.value.copy(
-                phase = StudyPhase.Session,
-                right = 0,
-                wrong = 0,
-                revealed = false
-            )
-            nextCard()
         }
     }
 
     fun resumeSession() {
+        if (sessionLaunchInFlight) return
+        sessionLaunchInFlight = true
+        _study.value = _study.value.copy(
+            phase = StudyPhase.Session,
+            current = null,
+            revealed = false,
+            isNew = false,
+            remaining = 0
+        )
         viewModelScope.launch {
-            val snap = store.sessionFlow.first() ?: return@launch
-            val session = sessionBuilder.resumeFromSnapshot(deck, snap) ?: return@launch
-            liveSession = session
-            _study.value = _study.value.copy(
-                phase = StudyPhase.Session,
-                trade = session.trade,
-                revealed = false
-            )
-            nextCard()
+            try {
+                val snap = store.sessionFlow.first()
+                val session = snap?.let { sessionBuilder.resumeFromSnapshot(deck, it) }
+
+                if (session == null) {
+                    // Nothing resumable after all: fall back to the idle state.
+                    _study.value = _study.value.copy(phase = StudyPhase.Home, canResume = false)
+                    return@launch
+                }
+                liveSession = session
+                _study.value = _study.value.copy(
+                    phase = StudyPhase.Session,
+                    trade = session.trade,
+                    revealed = false
+                )
+                nextCard()
+            } finally {
+                sessionLaunchInFlight = false
+            }
         }
     }
 
@@ -198,49 +320,81 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
             return
         }
         val card = session.queue.removeAt(0)
-        val enFirst = Random.nextBoolean()
         _study.value = _study.value.copy(
             current = card,
             revealed = false,
-            promptEnFirst = enFirst,
+            // Direction is a user preference, not a per-card coin flip.
+            promptEnFirst = learningDirection.value.promptIsEnglish,
             isNew = session.isNewCard(card),
             remaining = session.queue.size + 1,
+
             right = session.right,
             wrong = session.wrong
         )
     }
 
+    /** Flip the current card and speak the ANSWER in its language. No-op if already revealed. */
     fun reveal() {
+        val s = _study.value
+        val card = s.current ?: return
+        if (s.revealed) return
+        _study.value = s.copy(revealed = true)
+        speakAnswer(card)
+    }
+
+    /** "Hear English" / "Hear Spanish": repeat the answer side of the current card. */
+    fun hearAnswer() {
         val card = _study.value.current ?: return
-        _study.value = _study.value.copy(revealed = true)
-        // Speak answer in Spanish if answer is Spanish side
-        val answerIsEs = _study.value.promptEnFirst
-        if (answerIsEs) speech.speakSpanish(card.es) else speech.speakEnglish(card.en)
+        speakAnswer(card)
+    }
+
+    /** Always speaks the Spanish side of the current card. */
+    fun hearCurrentSpanish() {
+        val c = _study.value.current ?: return
+        speech.speakSpanish(c.es)
+    }
+
+    private fun speakAnswer(card: DeckCard) {
+        if (learningDirection.value.answerLanguage == "Spanish") {
+            speech.speakSpanish(card.es)
+        } else {
+            speech.speakEnglish(card.en)
+        }
+
     }
 
     fun grade(right: Boolean) {
         val session = liveSession ?: return
         val current = _study.value.current ?: return
-        if (!_study.value.revealed) return
+        if (!_study.value.revealed || gradeInFlight) return
+        gradeInFlight = true
         viewModelScope.launch {
-            val updated = sessionBuilder.grade(session, current, right, deck)
-            if (!session.isCategoryMode) {
-                store.commitCard(updated.id, Leitner.toProgress(updated))
-                // Persist any replacement introductions already reflected in deck
-                session.graduations.keys.forEach { key ->
-                    val c = deck.find { it.id == key }
-                    if (c != null) store.commitCard(c.id, Leitner.toProgress(c))
+            try {
+                val updated = sessionBuilder.grade(session, current, right, deck)
+                if (!session.isCategoryMode) {
+                    store.commitCard(updated.id, Leitner.toProgress(updated))
+                    // Persist any replacement introductions already reflected in deck
+                    session.graduations.keys.forEach { key ->
+                        val c = deck.find { it.id == key }
+                        if (c != null) store.commitCard(c.id, Leitner.toProgress(c))
+                    }
+                    store.saveSession(session.toSnapshot())
                 }
-                store.saveSession(session.toSnapshot())
-            }
-            streak = Leitner.bumpStreak(streak)
-            store.setStreak(streak)
-            refreshStats()
-            refreshBrowse()
-            if (session.queue.isEmpty()) {
-                finishSession()
-            } else {
-                nextCard()
+                streak = Leitner.bumpStreak(streak)
+                store.setStreak(streak)
+                refreshStats()
+                refreshBrowse()
+                refreshStudyHome()
+                // The lesson was ended or replaced while saving: don't advance it.
+                if (liveSession !== session || _study.value.phase != StudyPhase.Session) return@launch
+                if (session.queue.isEmpty()) {
+                    finishSession()
+                } else {
+                    nextCard()
+                }
+            } finally {
+
+                gradeInFlight = false
             }
         }
     }
@@ -270,7 +424,9 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** Return the Study tab to its idle state. The visible lobby is HomeScreen. */
     fun backToHome() {
+
         _study.value = _study.value.copy(phase = StudyPhase.Home, current = null, revealed = false)
         refreshStudyHome()
         viewModelScope.launch {
@@ -303,6 +459,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
             _listen.value = _listen.value.copy(
                 text = "Study a few cards first",
                 sideLabel = if (listenPlaying) "Nothing" else "Paused",
+
                 total = 0,
                 index = 0,
                 cardTrade = ""
@@ -335,6 +492,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         if (listenStep == 0) speech.speakSpanish(c.es) else speech.speakEnglish(c.en)
     }
 
+
     fun listenAdvance() {
         if (listenQueue.isEmpty()) return
         listenStep++
@@ -347,13 +505,13 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         if (listenPlaying) speakListenStep()
     }
 
-    fun hearCurrentSpanish() {
-        val c = _study.value.current ?: return
-        speech.speakSpanish(c.es)
-    }
-
     override fun onCleared() {
         speech.shutdown()
         super.onCleared()
     }
+
+    companion object {
+        private const val TAG = "AppViewModel"
+    }
 }
+
