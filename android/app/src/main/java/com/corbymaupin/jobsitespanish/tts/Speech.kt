@@ -26,9 +26,9 @@ class Speech(context: Context) : TextToSpeech.OnInitListener {
         try {
             val engine = tts ?: return
             val candidates = listOf(
-                Locale("es", "MX"),
-                Locale("es", "ES"),
-                Locale("es"),
+                Locale.forLanguageTag("es-MX"),
+                Locale.forLanguageTag("es-ES"),
+                Locale.forLanguageTag("es"),
                 Locale.US
             )
             for (locale in candidates) {
@@ -47,7 +47,7 @@ class Speech(context: Context) : TextToSpeech.OnInitListener {
     }
 
     fun speakSpanish(text: String) {
-        speak(text, Locale("es", "MX"))
+        speak(text, Locale.forLanguageTag("es-MX"))
     }
 
     fun speakEnglish(text: String) {

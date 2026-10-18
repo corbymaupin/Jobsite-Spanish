@@ -1,7 +1,7 @@
 # Jobsite Spanish — native Android (Kotlin + Jetpack Compose)
 
 **Package id:** `com.corbymaupin.jobsitespanish`  
-**Version:** `1.0.0` (`versionCode` 1)  
+**Version:** `1.0.3` (`versionCode` 4) · compile/target SDK 36  
 **No WebView / Capacitor / Cordova / TWA** — pure Compose UI.
 
 ## Monetization
@@ -17,7 +17,7 @@ Bottom nav → **Feedback**: category (Bug / Idea / Praise), message, optional e
 ## Open in Android Studio
 
 1. **File → Open** → select this `android/` folder (not the repo root).
-2. Let Gradle Sync finish (SDK 35 / JDK 17+ recommended).
+2. Let Gradle Sync finish (SDK 36 / JDK 17+ recommended).
 3. Run on an emulator or device (**minSdk 26**).
 
 Android Studio writes `local.properties` with your `sdk.dir` (gitignored).
@@ -43,7 +43,9 @@ keytool -genkey -v -keystore jobsite-spanish-upload.jks -keyalg RSA -keysize 204
 Then either:
 
 - Android Studio → **Build → Generate Signed Bundle / APK**, or
-- Put paths/passwords in a local `keystore.properties` (gitignored) and configure `signingConfigs` if you prefer CLI.
+- Create a local `android/keystore.properties` (gitignored) with `storeFile`, `storePassword`, `keyAlias`, `keyPassword`. `app/build.gradle.kts` picks it up automatically and signs `bundleRelease`; without it the AAB is unsigned.
+
+**Use the same upload key that signed 1.0.1 (versionCode 2) already in Play internal testing.** Play rejects bundles signed with a different upload key.
 
 ```bash
 cd android
