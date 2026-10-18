@@ -355,7 +355,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun speakAnswer(card: DeckCard) {
-        if (learningDirection.value.answerLanguage == "Spanish") {
+        if (learningDirection.value.promptLanguage == "Spanish") {
             speech.speakSpanish(card.es)
         } else {
             speech.speakEnglish(card.en)

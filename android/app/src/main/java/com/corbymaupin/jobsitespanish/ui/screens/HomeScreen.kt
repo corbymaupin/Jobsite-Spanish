@@ -119,7 +119,7 @@ fun HomeScreen(vm: AppViewModel, onOpenStudy: () -> Unit) {
             DirectionToggle(selected = direction, onSelect = vm::setLearningDirection)
             Spacer(Modifier.height(8.dp))
             Text(
-                "Cards show ${direction.promptLanguage}. Reveal plays the ${direction.answerLanguage} answer aloud.",
+                "Cards show ${direction.promptLanguage}. Audio plays in ${direction.promptLanguage}.",
                 color = JobsiteMuted,
                 fontSize = 13.sp,
                 lineHeight = 18.sp

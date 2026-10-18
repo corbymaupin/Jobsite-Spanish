@@ -18,7 +18,7 @@ enum class LearningDirection(
     val label: String
 ) {
     LEARN_SPANISH(storageValue = "learn_spanish", label = "Learn Spanish"),
-    LEARN_ENGLISH(storageValue = "learn_english", label = "Learn English");
+    LEARN_ENGLISH(storageValue = "learn_english", label = "Aprender Inglés");
 
     /** True when the card front shows English. Mirrors the legacy StudyUiState.promptEnFirst. */
     val promptIsEnglish: Boolean get() = this == LEARN_ENGLISH
@@ -29,9 +29,9 @@ enum class LearningDirection(
     /** Language of the answer: what reveal speaks and what the hear button repeats. */
     val answerLanguage: String get() = if (promptIsEnglish) "Spanish" else "English"
 
-    /** Study screen button label: "Hear English" or "Hear Spanish". */
+    /** Study screen button label: always the language being learned (the card front). */
 
-    val hearAnswerLabel: String get() = "Hear $answerLanguage"
+    val hearAnswerLabel: String get() = "Hear $promptLanguage"
 
     fun promptOf(card: DeckCard): String = if (promptIsEnglish) card.en else card.es
 
